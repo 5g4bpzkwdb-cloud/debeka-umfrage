@@ -1,5 +1,3 @@
-
-
 <!doctype html>
 <html lang="de">
 <head>
@@ -149,18 +147,10 @@
     }
     .qhead{display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:10px;}
     .qtitle{margin:0; font-size:14px; font-weight:800}
-    .qtag{
-      font-size:11px;
-      padding:5px 8px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(30,154,214,.12);
-      white-space:nowrap;
-    }
     .options{display:grid; gap:8px}
     .opt{
       display:flex; gap:10px; align-items:flex-start;
-      border:1px solid rgb(255, 255, 255);
+      border:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.12);
       padding:10px;
       border-radius:14px;
@@ -170,7 +160,6 @@
     .opt:hover{border-color:rgba(255,255,255,.14); transform: translateY(-1px)}
     .opt input{margin-top:2px}
     .opt span{font-size:13px}
-    .opt small{display:block; margin-top:2px; color:var(--muted); font-size:12px}
 
     textarea.field{min-height:96px; resize:vertical}
 
@@ -286,14 +275,13 @@
         <button class="tabbtn" data-tab="results" aria-selected="false">Auswertung</button>
       </nav>
 
-      <!-- QR progress (only in QR mode) -->
       <nav class="qrOnly" aria-label="QR Fortschritt" style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
         <span class="chip" id="qrStepChip">Schritt 1/3: Umfrage</span>
       </nav>
     </header>
 
     <div class="qrBanner" id="qrBanner">
-      <strong>Erst Umfrage, dann Q&A, dann Erklärungen.</strong> 
+      <strong>Erst Umfrage, dann Q&A, dann Erklärungen.</strong>
     </div>
 
     <!-- ADMIN OVERVIEW -->
@@ -404,7 +392,6 @@
                       <option value="" selected disabled>Bitte wählen…</option>
                       <option value="flyer">Flyer</option>
                       <option value="qr">Direkter QR-Code</option>
-                    
                     </select>
                   </div>
                 </div>
@@ -412,7 +399,6 @@
                 <div class="q">
                   <div class="qhead">
                     <p class="qtitle">1) Wie wichtig ist dir aktuell der Aufbau von Vermögen für deine Zukunft?</p>
-
                   </div>
                   <div class="options">
                     <label class="opt"><input type="radio" name="goal" value="ruecklagen" required>
@@ -432,10 +418,10 @@
                     <p class="qtitle">2) Weißt du, was ein Bausparvertrag ist und welche Vorteile er beim späteren Wohnen haben kann?</p>
                   </div>
                   <div class="options">
-                    <label class="opt"><input type="radio" name="bausparen_interest" value="unsicher">
+                    <label class="opt"><input type="radio" name="bausparen_interest" value="unsicher" required>
                       <span>Ja, kenne ich gut</span>
                     </label>
-                    <label class="opt"><input type="radio" name="bausparen_interest" value="sehr" required>
+                    <label class="opt"><input type="radio" name="bausparen_interest" value="sehr">
                       <span>Schon mal gehört</span>
                     </label>
                     <label class="opt"><input type="radio" name="bausparen_interest" value="eher">
@@ -447,7 +433,6 @@
                 <div class="q">
                   <div class="qhead">
                     <p class="qtitle">3) Nutzt du bereits vermögenswirksame Leistungen oder staatliche Förderungen (z. B. Wohnungsbauprämie)?</p>
-                    
                   </div>
                   <div class="options">
                     <label class="opt"><input type="radio" name="bausparen_barrier" value="wissen" required>
@@ -465,26 +450,23 @@
                 <div class="q">
                   <div class="qhead">
                     <p class="qtitle">4) Welche Versicherungen hast du aktuell?</p>
-                    
                   </div>
                   <div class="options" id="insuranceOptions">
-                    <label class="opt"><input type="radio" name="insurance_priorities" value="Mehrere">
+                    <label class="opt"><input type="radio" name="insurance_priorities" value="Mehrere" required>
                       <span>Mehrere wichtige (z. B. Haftpflicht etc.)</span>
                     </label>
                     <label class="opt"><input type="radio" name="insurance_priorities" value="wenig">
                       <span>Nur wenige</span>
                     </label>
-                    <label class="opt"><input type="radio" name="insurance_priorities" value="keine" required>
+                    <label class="opt"><input type="radio" name="insurance_priorities" value="keine">
                       <span>Noch keine / unsicher</span>
                     </label>
                   </div>
-                  
                 </div>
 
                 <div class="q">
                   <div class="qhead">
                     <p class="qtitle">5) Hast du einen Plan, wie du deine finanzielle Zukunft (Wohnen, Absicherung, Sparen) gestalten möchtest?</p>
-                   
                   </div>
                   <div class="options">
                     <label class="opt"><input type="radio" name="contact_pref" value="kurz" required>
@@ -499,10 +481,8 @@
                   </div>
                 </div>
 
-              
-
                 <div class="btnRow">
-                  <button type="submit" class="btn">Umfrage abschicken</button>
+                  <button type="submit" class="btn" id="submitBtn">Umfrage abschicken</button>
                   <button type="button" class="btn secondary adminOnly" id="fillDemo">Demo ausfüllen</button>
                 </div>
 
@@ -554,7 +534,7 @@
           <div class="card adminOnly">
             <div class="inner">
               <h2>Admin: Inhalte tauschen</h2>
-              <p>Die Texte stehen in <strong>QNA_LIBRARY</strong>. Nur dort ersetzen – Logik bleibt gleich.</p>
+              <p>Die Texte stehen im Code. Logik bleibt gleich.</p>
             </div>
           </div>
         </div>
@@ -588,7 +568,7 @@
           <div class="card adminOnly">
             <div class="inner">
               <h2>Admin: Inhalte tauschen</h2>
-              <p>Die Texte stehen in <strong>EXPLAIN_LIBRARY</strong>. Nur dort ersetzen – Logik bleibt gleich.</p>
+              <p>Die Texte stehen im Code. Logik bleibt gleich.</p>
             </div>
           </div>
         </div>
@@ -625,7 +605,7 @@
                 <button class="btn secondary" type="button" id="adminToOverview">Zur Übersicht</button>
                 <button class="btn secondary" type="button" id="adminToSurvey">Zur Umfrage</button>
               </div>
-              <div class="note">Diese Auswertung ist lokal (Browser). Später könnt ihr das auf ein Backend umstellen.</div>
+              <div class="note">Diese Auswertung ist lokal (Browser).</div>
             </div>
           </div>
         </div>
@@ -640,62 +620,16 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <!-- =========================
+       APP LOGIC (NON-MODULE)
+       ========================= -->
   <script>
     // -----------------------------
     // Storage keys (lokal)
     // -----------------------------
     const STORE_ANSWERS = "debeka_answers_v3";
     const STORE_LAST = "debeka_last_answer_v3";
-
-    // -----------------------------
-    // Q&A library (PLATZHALTER!)
-    // -----------------------------
-    
-
-    // -----------------------------
-    // EXPLAIN library (PLATZHALTER!)
-    // -> "Erklärungen & Ausführungen" nach dem Q&A
-    // -----------------------------
-    const EXPLAIN_LIBRARY = {
-      base: [
-        {
-          title: "[PLATZHALTER] Kurz-Guide: So triffst du Entscheidungen",
-          body: "[PLATZHALTER] 1) Ziel klären  2) Budget prüfen  3) Risiken priorisieren  4) Optionen vergleichen  5) Entscheidung dokumentieren."
-        }
-      ],
-      byBarrier: {
-        wissen: {
-          title: "[PLATZHALTER] Begriffe einfach erklärt",
-          body: "[PLATZHALTER] Glossar: Sparphase, Zuteilung, Darlehen, Abschlusskosten, Effektivkosten…"
-        },
-        budget: {
-          title: "[PLATZHALTER] Budget-Planung",
-          body: "[PLATZHALTER] Beispiel: fixe/variable Kosten + Sparrate + Puffer. Was heißt „flexibel“ in der Praxis?"
-        },
-        lohnt: {
-          title: "[PLATZHALTER] Lohnt es sich? – Bewertungsraster",
-          body: "[PLATZzPLATZHALTER] Faktoren: Gebühren, Zinserwartung, Zeit, Planbarkeit, Alternativen."
-        },
-        flex: {
-          title: "[PLATZHALTER] Flexibilität & Laufzeit",
-          body: "[PLATZHALTER] Welche Stellschrauben gibt es typischerweise (Sparrate pausieren/anpassen etc.)?"
-        }
-      },
-      byInsurance: {
-        haftpflicht: {
-          title: "[PLATZHALTER] Haftpflicht – typische Fälle",
-          body: "[PLATZHALTER] Beispiele aus Alltag/Studium + worauf bei Deckungssumme/Ausschlüssen achten."
-        },
-        bu: {
-          title: "[PLATZHALTER] BU – worum geht’s wirklich?",
-          body: "[PLATZHALTER] Absicherung des Einkommens + wichtige Begriffe + wann Beratung sinnvoll ist."
-        },
-        reise: {
-          title: "[PLATZHALTER] Auslandsreise-KV – Checkliste",
-          body: "[PLATZHALTER] Leistungen, Dauer, Ausschlüsse, Notfallnummer, Selbstbehalt…"
-        }
-      }
-    };
+    const STORE_SESSION = "debeka_session_id_v1";
 
     // -----------------------------
     // Helpers
@@ -712,46 +646,27 @@
     }
 
     function readAll(){
-      try{ return JSON.parse(localStorage.getItem("debeka_answers_v3") || "[]"); } catch { return []; }
+      try{ return JSON.parse(localStorage.getItem(STORE_ANSWERS) || "[]"); } catch { return []; }
     }
     function writeAll(arr){
-  localStorage.setItem(STORE_ANSWERS, JSON.stringify(arr));
-  updateResultsUI();
-  updateOverviewKpis();
-
-  //  Cloud Sync (Firestore) – speichert die komplette Übersicht
-  trySyncAllToCloud(arr);
-}
-async function trySyncAllToCloud(arr){
-  try{
-    // Nur wenn Firebase initialisiert ist
-    if(!window.db || !window.firebaseAddDoc || !window.firebaseCollection) return;
-
-    // Optional: nicht im Admin-Modus syncen (wenn du willst)
-    // if(!(location.hash || "").toLowerCase().includes("qr")) return;
-
-    await window.firebaseAddDoc(
-      window.firebaseCollection(window.db, "responses"),
-      {
-  answers: (arr && arr.length) ? arr[arr.length - 1] : null,   // ✅ nur die letzte Umfrage
-  createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
-  page: location.href,
-  ua: navigator.userAgent
-}
-
-    );
-    // optional: toast("Cloud gespeichert ✅");
-  } catch(e){
-    console.error("Cloud Sync (all) failed:", e);
-    // optional: toast("Speichern fehlgeschlagen (Cloud).");
-  }
-}
-
+      localStorage.setItem(STORE_ANSWERS, JSON.stringify(arr));
+      updateResultsUI();
+      updateOverviewKpis();
+    }
 
     function getLastAnswer(){
       try{ return JSON.parse(localStorage.getItem(STORE_LAST) || "null"); }catch{ return null; }
     }
     function setLastAnswer(a){ localStorage.setItem(STORE_LAST, JSON.stringify(a)); }
+
+    function getSessionId(){
+      let sid = localStorage.getItem(STORE_SESSION);
+      if(!sid){
+        sid = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ("sid_" + Math.random().toString(16).slice(2));
+        localStorage.setItem(STORE_SESSION, sid);
+      }
+      return sid;
+    }
 
     function freqTop(values){
       const map = new Map();
@@ -800,7 +715,6 @@ async function trySyncAllToCloud(arr){
       const params = new URLSearchParams(location.search);
       return location.hash.toLowerCase().includes("qr") || params.get("qr")==="1";
     }
-
     function setQRStep(step){
       const chip = $("#qrStepChip");
       if(!chip) return;
@@ -812,60 +726,44 @@ async function trySyncAllToCloud(arr){
       chip.textContent = labels[step] || "Schritt";
     }
 
-    // -----------------------------
-    // Survey: limit insurance to 2
-    // -----------------------------
-    const insWrap = $("#insuranceOptions");
-    if(insWrap) insWrap.addEventListener("change", (e)=>{
-      const checks = $$("input[type='checkbox'][name='insurance_priorities']", $("#insuranceOptions"));
-      const picked = checks.filter(c=>c.checked);
-      if(picked.length > 2){
-        e.target.checked = false;
-        toast("Maximal 2 auswählen 🙂");
-      }
-    });
+    function unlockNextTabs(){
+      $("#qnaTab").disabled = false;
+      $("#explainTab").disabled = false;
+    }
 
     // -----------------------------
-    // Q&A generation
+    // Q&A
     // -----------------------------
     function buildProfileText(a){
-      const ins = (a.insurance_priorities||[]).join(", ") || "–";
+      const ins = (Array.isArray(a.insurance_priorities) ? a.insurance_priorities : [a.insurance_priorities]).filter(Boolean).join(", ") || "–";
       const src = a.source ? ` · Quelle: ${a.source}` : "";
       return `Bausparen: ${a.bausparen_interest || "–"} · Hürde: ${a.bausparen_barrier || "–"} · Versicherungen: ${ins}${src}`;
     }
 
-    
     function pickQnaForAnswer(a){
-  // IMMER die gleichen 4 Fragen anzeigen (unabhängig von Antworten)
-  return [
-    {
-      cat: "Bauchsparen",
-      q: "Was ist ein Bausparvertrag und welchen Nutzen hat er?",
-      a: "Ein Bausparvertrag kombiniert Sparen und Finanzierung in einem Produkt. Du sparst zunächst regelmäßig Geld an und sicherst dir dadurch später ein zinsgünstiges Darlehen für wohnwirtschaftliche Zwecke, z. B. Immobilienkauf, Renovierung oder Modernisierung. Der Nutzen liegt vor allem in planbaren Zinsen, langfristiger Sicherheit und möglichen staatlichen Förderungen. Besonders für junge Erwachsene kann er helfen, frühzeitig Eigenkapital aufzubauen und sich stabile Finanzierungskonditionen für die Zukunft zu sichern.."
-    },
-    {
-      cat: "Staatliche Förderung",
-      q: "Welche staatlichen Förderungen gibt es beim Vermögensaufbau und wie funktionieren sie?",
-      a: "Beim Vermögensaufbau kannst du unter bestimmten Voraussetzungen staatliche Förderungen nutzen, z. B. die Wohnungsbauprämie oder die Arbeitnehmer-Sparzulage. Die Wohnungsbauprämie unterstützt dich beim Sparen für wohnwirtschaftliche Zwecke wie einen Bausparvertrag und erhöht deine Einzahlungen durch einen staatlichen Zuschuss. Die Arbeitnehmer-Sparzulage fördert vermögenswirksame Leistungen vom Arbeitgeber, wenn diese in geeignete Sparformen eingezahlt werden. Der Nutzen besteht darin, dass du zusätzliches Geld vom Staat erhältst und dadurch schneller Vermögen aufbauen kannst."
-    },
-    {
-      cat: "Vermögenswirksame Leistungen",
-      q: "Was sind vermögenswirksame Leistungen und wie kannst du davon profitieren?",
-      a: "Vermögenswirksame Leistungen (VL) sind Geldbeträge, die dein Arbeitgeber zusätzlich zu deinem Gehalt in einen Sparvertrag einzahlen kann. Diese können z. B. in einen Bausparvertrag, Fonds oder andere geförderte Sparformen fließen. Der Nutzen liegt darin, dass du mit Unterstützung deines Arbeitgebers Vermögen aufbaust und unter bestimmten Voraussetzungen zusätzlich staatliche Förderungen wie die Arbeitnehmer-Sparzulage erhalten kannst. Um VL zu bekommen, musst du deinen Arbeitgeber danach fragen und einen passenden Sparvertrag auswählen."
-    },
-    {
-      cat: "Versicherungen",
-      q: "Warum sind Versicherungen wichtig und welchen Nutzen haben sie?",
-      a: "Versicherungen dienen dazu, finanzielle Risiken abzusichern und dich vor unerwarteten Kosten zu schützen. Sie funktionieren nach dem Prinzip der Solidargemeinschaft: Viele zahlen Beiträge ein, damit im Schadensfall einzelne finanziell unterstützt werden können. Der Nutzen besteht darin, dass große finanzielle Belastungen, z. B. durch Schäden, Unfälle oder Haftungsfälle, nicht allein getragen werden müssen. Besonders grundlegende Versicherungen können helfen, deine finanzielle Sicherheit zu erhöhen und langfristige Planung zu ermöglichen, beispielsweise eine private Haftpflichtversicherung zum Schutz vor Schadensersatzforderungen oder eine Berufsunfähigkeitsversicherung zur Absicherung deines Einkommens."
-    },
-    {
-      cat: "Beratung",
-      q: "Intersse geweckt?",
-      a: "Für einen Termin zur individuellen Beratung der Debeka erkundigen Sie sich unter: 0800 888008200",
-    },
-  ];
-}
-
+      return [
+        {
+          cat: "Bausparen",
+          q: "Was ist ein Bausparvertrag und welchen Nutzen hat er?",
+          a: "Ein Bausparvertrag kombiniert Sparen und Finanzierung: Du sparst zuerst Geld an und kannst später ein Darlehen mit planbaren Konditionen für wohnwirtschaftliche Zwecke nutzen. Für junge Erwachsene ist der Nutzen vor allem: früh Eigenkapital aufbauen, Zinsen planbar halten und ggf. Förderungen mitnehmen."
+        },
+        {
+          cat: "Staatliche Förderung",
+          q: "Welche staatlichen Förderungen gibt es beim Vermögensaufbau und wie funktionieren sie?",
+          a: "Wichtig sind z. B. Wohnungsbauprämie und Arbeitnehmer-Sparzulage. Beide sind Zuschüsse, die unter Voraussetzungen (z. B. Einkommensgrenzen/geeignete Verträge) helfen, schneller Vermögen aufzubauen."
+        },
+        {
+          cat: "Vermögenswirksame Leistungen",
+          q: "Was sind vermögenswirksame Leistungen und wie kannst du davon profitieren?",
+          a: "VL sind Extra-Zahlungen vom Arbeitgeber in einen Sparvertrag (z. B. Bausparen/Fonds). Du profitierst doppelt: Arbeitgeber zahlt mit – und ggf. kommt zusätzlich die Arbeitnehmer-Sparzulage dazu."
+        },
+        {
+          cat: "Versicherungen",
+          q: "Warum sind Versicherungen wichtig und welchen Nutzen haben sie?",
+          a: "Sie schützen dich vor hohen, unerwarteten Kosten. Beispiele: Privathaftpflicht (wenn du jemandem Schaden zufügst), Berufsunfähigkeit (wenn du länger nicht arbeiten kannst)."
+        }
+      ];
+    }
 
     function renderQna(a){
       $("#profileLine").textContent = buildProfileText(a);
@@ -893,61 +791,97 @@ async function trySyncAllToCloud(arr){
       });
     }
 
-    function unlockNextTabs(){
-      $("#qnaTab").disabled = false;
-      $("#explainTab").disabled = false;
+    // -----------------------------
+    // Explain (fixe 2)
+    // -----------------------------
+    function renderExplain(){
+      const root = document.getElementById("explainList");
+      root.innerHTML = "";
+
+      const fixedExplain = [
+        {
+          title: "Staatliche Förderungen – was es gibt und wie du sie nutzt",
+          text: "Der Staat unterstützt Vermögensaufbau u. a. über Wohnungsbauprämie und Arbeitnehmer-Sparzulage. Wichtig sind passende Verträge und Voraussetzungen (z. B. Einkommensgrenzen). Die Beantragung läuft in der Praxis häufig über Anbieter/Steuer (je nach Förderung)."
+        },
+        {
+          title: "Vermögenswirksame Leistungen – wie du sie bekommst und sinnvoll nutzt",
+          text: "VL sind zusätzliche Arbeitgeber-Zahlungen in einen Sparvertrag. Du musst beim Arbeitgeber nachfragen und einen VL-fähigen Vertrag angeben. Unter Bedingungen kann zusätzlich die Arbeitnehmer-Sparzulage greifen."
+        }
+      ];
+
+      fixedExplain.forEach(item=>{
+        const d = document.createElement("details");
+        const s = document.createElement("summary");
+        s.textContent = item.title;
+
+        const body = document.createElement("div");
+        body.className = "faqBody";
+        body.textContent = item.text;
+
+        d.appendChild(s);
+        d.appendChild(body);
+        root.appendChild(d);
+      });
     }
 
     // -----------------------------
-    // Explain generation
+    // RESULTS UI (lokal)
     // -----------------------------
-    function renderExplain() {
-
-  const root = document.getElementById("explainList");
-  root.innerHTML = "";
-
-  const fixedExplain = [
-
-    {
-      
-      title: "Staatliche Förderungen – wie sie funktionieren und wie du sie nutzt",
-      text: "Viele junge Erwachsene wissen nicht, dass der Staat aktiv beim Vermögensaufbau unterstützt. Zu den wichtigsten Förderungen gehören die Wohnungsbauprämie und die Arbeitnehmer-Sparzulage. Die Wohnungsbauprämie ist ein staatlicher Zuschuss, der gewährt wird, wenn du regelmäßig Geld in einen geeigneten Sparvertrag, zum Beispiel einen Bausparvertrag, einzahlst. Ziel ist es, dich beim langfristigen Aufbau von Eigenkapital für wohnwirtschaftliche Zwecke zu unterstützen. Die Arbeitnehmer-Sparzulage hingegen fördert vermögenswirksame Leistungen (VL), also Geld, das dein Arbeitgeber zusätzlich zum Gehalt in einen Sparvertrag einzahlen kann. Damit du diese Förderungen erhältst, müssen bestimmte Voraussetzungen erfüllt sein, wie beispielsweise Einkommensgrenzen oder die Nutzung eines zugelassenen Vertrags. Die Beantragung erfolgt meist nicht direkt über einen separaten Antrag, sondern wird über deine jährliche Steuererklärung oder automatisch über den Anbieter abgewickelt. Gerade für junge Erwachsene lohnt sich ein genauer Blick auf diese Förderungen, da sie eine Möglichkeit bieten, mit relativ kleinen eigenen Beiträgen und zusätzlicher Unterstützung durch Staat und Arbeitgeber langfristig Vermögen aufzubauen."
-
-
-    },
-
-    {
-      title: "Vermögenswirksame Leistungen – wie sie funktionieren und wie du sie optimal nutzt",
-      text: "Vermögenswirksame Leistungen (VL) sind ein zusätzlicher Geldbetrag, den dein Arbeitgeber freiwillig oder tariflich geregelt für dich sparen kann. Dieses Geld wird nicht direkt ausgezahlt, sondern in einen geeigneten Sparvertrag eingezahlt, zum Beispiel einen Bausparvertrag oder eine andere geförderte Anlageform. Ziel der VL ist es, Arbeitnehmer beim langfristigen Vermögensaufbau zu unterstützen. Um VL zu erhalten, musst du zunächst prüfen, ob dein Arbeitgeber diese anbietet und anschließend einen passenden Vertrag auswählen, in den die Beiträge eingezahlt werden können. Häufig ist dafür ein einfacher Antrag beim Arbeitgeber notwendig. Unter bestimmten Voraussetzungen kannst du zusätzlich staatliche Förderung in Form der Arbeitnehmer-Sparzulage erhalten, wenn dein Einkommen unter festgelegten Grenzen liegt. Für junge Erwachsene sind VL besonders interessant, da sie oft ohne großen eigenen finanziellen Aufwand genutzt werden können und einen frühen Einstieg in regelmäßiges Sparen ermöglichen. Wichtig ist dabei, sich frühzeitig zu informieren, da viele Berufseinsteiger diese Möglichkeit nicht kennen und dadurch finanzielle Vorteile ungenutzt bleiben."
-    },
-
-  ];
-
-  fixedExplain.forEach(item => {
-
-    const box = document.createElement("div");
-    box.className = "faqBody";
-
-    const h = document.createElement("h3");
-    h.textContent = item.title;
-
-    const p = document.createElement("p");
-    p.textContent = item.text;
-
-    box.appendChild(h);
-    box.appendChild(p);
-
-    root.appendChild(box);
-
-  });
-
-}
-
+    function updateResultsUI(){
+      const all = readAll();
+      const rCount = $("#rCount"); if(rCount) rCount.textContent = String(all.length);
+      const rB = $("#rBausparen"); if(rB) rB.textContent = freqTop(all.map(x=>x.bausparen_interest));
+      const rI = $("#rInsurance"); if(rI) rI.textContent = freqTop(all.map(x=>x.insurance_priorities));
+      const box = $("#exportBox");
+      if(box){
+        box.value = JSON.stringify({ exportedAt: new Date().toISOString(), count: all.length, answers: all }, null, 2);
+      }
+    }
+    function updateOverviewKpis(){
+      const all = readAll();
+      const k1 = $("#kpiCount"); if(k1) k1.textContent = String(all.length);
+      const k2 = $("#kpiTopBausparen"); if(k2) k2.textContent = freqTop(all.map(x=>x.bausparen_interest));
+      const k3 = $("#kpiTopInsurance"); if(k3) k3.textContent = freqTop(all.map(x=>x.insurance_priorities));
+    }
 
     // -----------------------------
-    // Submit survey
+    // FIRESTORE: robust submit (one doc per submission)
     // -----------------------------
-    $("#surveyForm").addEventListener("submit", (e)=>{
+    async function saveSubmissionToCloud(payload){
+      // wartet auf Firebase init (module script setzt window.__firebaseReadyPromise)
+      try{
+        if(window.__firebaseReadyPromise) await window.__firebaseReadyPromise;
+      }catch(e){
+        console.error("Firebase init failed:", e);
+        throw e;
+      }
+
+      if(!window.db || !window.firebaseAddDoc || !window.firebaseCollection || !window.firebaseServerTimestamp){
+        throw new Error("Firebase globals not ready.");
+      }
+
+      const sessionId = getSessionId();
+      const submissionId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ("sub_" + Math.random().toString(16).slice(2));
+
+      await window.firebaseAddDoc(
+        window.firebaseCollection(window.db, "responses"),
+        {
+          submissionId,
+          sessionId,
+          createdAt: window.firebaseServerTimestamp(),
+          page: location.href,
+          ua: navigator.userAgent,
+          answers: payload
+        }
+      );
+
+      return { submissionId, sessionId };
+    }
+
+    // -----------------------------
+    // SUBMIT survey (lokal + cloud)
+    // -----------------------------
+    $("#surveyForm").addEventListener("submit", async (e)=>{
       e.preventDefault();
       const form = e.target;
       const fd = new FormData(form);
@@ -960,12 +894,11 @@ async function trySyncAllToCloud(arr){
         goal: fd.get("goal") || "",
         bausparen_interest: fd.get("bausparen_interest") || "",
         bausparen_barrier: fd.get("bausparen_barrier") || "",
-        insurance_priorities: fd.getAll("insurance_priorities"),
-        contact_pref: fd.get("contact_pref") || "",
-        openText: (fd.get("openText") || "").toString().trim()
+        insurance_priorities: fd.get("insurance_priorities") || "",
+        contact_pref: fd.get("contact_pref") || ""
       };
 
-      const required = ["ageGroup","status","source","goal","bausparen_interest","bausparen_barrier","contact_pref"];
+      const required = ["ageGroup","status","source","goal","bausparen_interest","bausparen_barrier","insurance_priorities","contact_pref"];
       const missing = required.filter(k => !payload[k]);
       if(missing.length){
         $("#surveyStatus").textContent = "Bitte fülle alle Pflichtfelder aus.";
@@ -973,19 +906,33 @@ async function trySyncAllToCloud(arr){
         return;
       }
 
+      // UI lock while saving
+      const btn = document.getElementById("submitBtn");
+      btn.disabled = true;
+      $("#surveyStatus").textContent = "Speichern…";
+
+      // 1) Lokal speichern (damit Admin-Auswertung weiterhin geht)
       const all = readAll();
       all.push(payload);
       writeAll(all);
       setLastAnswer(payload);
 
-      $("#surveyStatus").textContent = "Danke! Weiter zum Q&A …";
-      toast("Gespeichert ✅");
+      // 2) Cloud speichern (Firebase)
+      try{
+        await saveSubmissionToCloud(payload);
+        $("#surveyStatus").textContent = "Danke! Gespeichert ✅ Weiter zum Q&A …";
+        toast("Cloud gespeichert ✅");
+      }catch(err){
+        console.error("Firestore save failed:", err);
+        $("#surveyStatus").textContent = "Gespeichert (lokal). Cloud-Speicherung fehlgeschlagen.";
+        toast("Cloud fehlgeschlagen ❌");
+      }finally{
+        btn.disabled = false;
+      }
 
       unlockNextTabs();
       renderQna(payload);
-      renderExplain(payload);
-      updateResultsUI();
-      updateOverviewKpis();
+      renderExplain();
 
       if(isQRMode()){
         setQRStep(2);
@@ -993,25 +940,6 @@ async function trySyncAllToCloud(arr){
       showTab("qna");
       form.reset();
     });
-
-    // admin demo fill
-    const demoBtn = $("#fillDemo");
-    if(demoBtn){
-      demoBtn.addEventListener("click", ()=>{
-        $("#ageGroup").value = "19-22";
-        $("#status").value = "student";
-        $$("input[name='goal']").find(x=>x.value==="wohnen").checked = true;
-        $$("input[name='bausparen_interest']").find(x=>x.value==="unsicher").checked = true;
-        $$("input[name='bausparen_barrier']").find(x=>x.value==="wissen").checked = true;
-        const boxes = $$("input[type='checkbox'][name='insurance_priorities']");
-        boxes.forEach(b=>b.checked=false);
-        boxes.find(b=>b.value==="haftpflicht").checked = true;
-        boxes.find(b=>b.value==="reise").checked = true;
-        $$("input[name='contact_pref']").find(x=>x.value==="faq").checked = true;
-        $("#openText").value = "Was ist der Unterschied zwischen Bausparen und alternativen Sparformen?";
-        toast("Demo ausgefüllt – jetzt absenden");
-      });
-    }
 
     // Q&A -> Explain
     $("#toExplain").addEventListener("click", ()=>{
@@ -1021,7 +949,7 @@ async function trySyncAllToCloud(arr){
         showTab("survey");
         return;
       }
-      renderExplain(last);
+      renderExplain();
       unlockNextTabs();
       if(isQRMode()) setQRStep(3);
       showTab("explain");
@@ -1038,13 +966,11 @@ async function trySyncAllToCloud(arr){
       if(isQRMode()) setQRStep(2);
     });
     $("#toResults").addEventListener("click", ()=>showTab("results"));
-
     $("#adminToOverview").addEventListener("click", ()=>showTab("overview"));
     $("#adminToSurvey").addEventListener("click", ()=>showTab("survey"));
 
     // QR restart button
     $("#qrRestart").addEventListener("click", ()=>{
-      // restart flow without deleting data
       setQRStep(1);
       showTab("survey");
       document.getElementById("surveyForm").scrollIntoView({behavior:"smooth", block:"start"});
@@ -1064,28 +990,6 @@ async function trySyncAllToCloud(arr){
       showTab(isQRMode() ? "survey" : "overview");
       if(isQRMode()) setQRStep(1);
     });
-
-    // Results UI (admin)
-    function updateResultsUI(){
-      const all = readAll();
-      const rCount = $("#rCount"); if(rCount) rCount.textContent = String(all.length);
-      const rB = $("#rBausparen"); if(rB) rB.textContent = freqTop(all.map(x=>x.bausparen_interest));
-      const rI = $("#rInsurance"); if(rI) rI.textContent = freqTop(all.map(x=>x.insurance_priorities));
-      const box = $("#exportBox");
-      if(box){
-        box.value = JSON.stringify({ exportedAt: new Date().toISOString(), count: all.length, answers: all }, null, 2);
-      }
-    }
-
-    function updateOverviewKpis(){
-      const all = readAll();
-      const k1 = $("#kpiCount"); if(k1) k1.textContent = String(all.length);
-      const k2 = $("#kpiTopBausparen"); if(k2) k2.textContent = freqTop(all.map(x=>x.bausparen_interest));
-      const k3 = $("#kpiTopInsurance"); if(k3) k3.textContent = freqTop(all.map(x=>x.insurance_priorities));
-    }
-
-    updateResultsUI();
-    updateOverviewKpis();
 
     // Export actions
     const copyBtn = $("#copyJson");
@@ -1111,6 +1015,9 @@ async function trySyncAllToCloud(arr){
       });
     }
 
+    updateResultsUI();
+    updateOverviewKpis();
+
     // Boot
     function boot(){
       const baseUrl = location.href.split("#")[0].split("?")[0];
@@ -1125,66 +1032,51 @@ async function trySyncAllToCloud(arr){
       if(qr){
         document.body.classList.add("qr-mode");
         $("#qrBanner").style.display = "block";
-        // QR flow always starts at survey
         showTab("survey");
         setQRStep(1);
-        toast("QR-Modus aktiv ✅");
-
-        // If there is a last answer (same device), allow jumping to Q&A/Explain
-        const last = getLastAnswer();
-        if(last){
-          unlockNextTabs();
-          renderQna(last);
-          renderExplain(last);
-          // If user refreshes in qr mode after survey, keep them at survey (step 1) to re-answer
-          // They will progress after submit again.
-        }
       }else{
-        // admin mode
         const last = getLastAnswer();
         if(last){
           unlockNextTabs();
           renderQna(last);
-          renderExplain(last);
+          renderExplain();
         }
         showTab("overview");
       }
     }
     boot();
-    function applyQrMode() {
-  const isQr = (location.hash || "").toLowerCase().includes("qr");
-    }
-
   </script>
 
-  <!-- dein kompletter Website Inhalt -->
-
+  <!-- =========================
+       FIREBASE INIT (MODULE)
+       ========================= -->
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAFFwh67DFW4b3aKwPRlit7GRvH0bKlDG8",
-    authDomain: "debeka-umfrage.firebaseapp.com",
-    projectId: "debeka-umfrage",
-    storageBucket: "debeka-umfrage.firebasestorage.app",
-    messagingSenderId: "295363329740",
-    appId: "1:295363329740:web:fd2e3f6ee264bb9a208c69"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFFwh67DFW4b3aKwPRlit7GRvH0bKlDG8",
+      authDomain: "debeka-umfrage.firebaseapp.com",
+      projectId: "debeka-umfrage",
+      storageBucket: "debeka-umfrage.firebasestorage.app",
+      messagingSenderId: "295363329740",
+      appId: "1:295363329740:web:fd2e3f6ee264bb9a208c69"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  window.db = getFirestore(app);
+    // Promise, damit der normale Script-Teil sauber warten kann
+    window.__firebaseReadyPromise = (async () => {
+      const app = initializeApp(firebaseConfig);
+      window.db = getFirestore(app);
 
-  // Diese Globals nutzt dein bestehender Code (writeAll -> trySyncAllToCloud)
-  window.firebaseCollection = collection;
-  window.firebaseAddDoc = addDoc;
-  window.firebaseServerTimestamp = serverTimestamp;
+      // Globals, die wir in saveSubmissionToCloud nutzen
+      window.firebaseCollection = collection;
+      window.firebaseAddDoc = addDoc;
+      window.firebaseServerTimestamp = serverTimestamp;
 
-  console.log("✅ Firebase init ok");
-</script>
-
-
-
+      console.log("✅ Firebase init ok");
+      return true;
+    })();
+  </script>
 
 </body>
 </html>
