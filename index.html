@@ -1196,20 +1196,21 @@ form.addEventListener("submit", async (e) => {
       data[k] = v;
     }
   }
+})
 
-  try {
-    await addDoc(collection(window.db, "responses"), {
-      answers: data,
-      createdAt: serverTimestamp(),
-      page: location.href,
-      ua: navigator.userAgent
-    });
-    console.log("✅ Firestore gespeichert", data);
-  } catch (err) {
-    console.error("❌ Firestore Fehler:", err);
-    alert("Speichern fehlgeschlagen (Cloud). Öffne die Konsole (F12) für Details.");
-  }
-});
+  //try {
+    //await addDoc(collection(window.db, "responses"), {
+      //answers: data,
+      //createdAt: serverTimestamp(),
+     // page: location.href,
+     // ua: navigator.userAgent
+    //});
+    //console.log("✅ Firestore gespeichert", data);
+  //} catch (err) {
+    //console.error("❌ Firestore Fehler:", err);
+   // alert("Speichern fehlgeschlagen (Cloud). Öffne die Konsole (F12) für Details.");
+  //}
+//});
 
   </script>
 
