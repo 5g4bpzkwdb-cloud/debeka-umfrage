@@ -712,7 +712,7 @@
     }
 
     function readAll(){
-      try{ return JSON.parse(localStorage.getItem(STORE_ANSWERS) || "[]"); } catch { return []; }
+      try{ return JSON.parse(localStorage.getItem("debeka_answers_v3") || "[]"); } catch { return []; }
     }
     function writeAll(arr){
   localStorage.setItem(STORE_ANSWERS, JSON.stringify(arr));
@@ -1177,40 +1177,47 @@ async function trySyncAllToCloud(arr){
     const app = initializeApp(firebaseConfig);
     window.db = getFirestore(app);
     // ===== Survey -> Firestore speichern =====
-//const form = document.getElementById("surveyForm");
+const form = document.getElementById("surveyForm");
 
-//form.addEventListener("submit", async (e) => {
+form.addEventListener("submit", async (e) => {
   // Wenn dein bestehender Code bereits e.preventDefault() nutzt,
   // dann lass diese Zeile drin – sonst speichert es nicht stabil.
- //e.preventDefault();
+  e.preventDefault();
 
-  //const formData = new FormData(form);
+  const formData = new FormData(form);
 
   // Radio-Gruppen / Mehrfachwerte sauber sammeln
-  //const data = {};
-  //for (const [k, v] of formData.entries()) {
-   // if (data[k]) {
+  const data = {};
+  for (const [k, v] of formData.entries()) {
+    if (data[k]) {
       // falls Mehrfachauswahl irgendwann vorkommt
-     // data[k] = Array.isArray(data[k]) ? [...data[k], v] : [data[k], v];
-    //} else {
-     // data[k] = v;
-    //}
-//  }
+      data[k] = Array.isArray(data[k]) ? [...data[k], v] : [data[k], v];
+    } else {
+      data[k] = v;
+    }
+  }
+}
 
+  // 1) Lokale Gesamtauswertung (so wie Admin-View sie nutzt) holen:
+let answersAll = [];
+try {
+  answersAll = JSON.parse(localStorage.getItem("debeka_answers_v3") || "[]");
+} catch (e) {
+  answersAll = [];
+}
 
-  //try {
-    //await addDoc(collection(window.db, "responses"), {
-      //answers: data,
-      //createdAt: serverTimestamp(),
-     // page: location.href,
-     // ua: navigator.userAgent
-    //});
-    //console.log("✅ Firestore gespeichert", data);
-  //} catch (err) {
-    //console.error("❌ Firestore Fehler:", err);
-   // alert("Speichern fehlgeschlagen (Cloud). Öffne die Konsole (F12) für Details.");
-  //}
-//});
+// 2) Dieses neue Ergebnis noch anhängen (falls dein bestehender Code es NICHT schon vorher gespeichert hat):
+answersAll.push({ ...data, _ts: Date.now() });
+
+// 3) Firestore: alles speichern
+await addDoc(collection(window.db, "responses"), {
+  answersAll: answersAll,          // ✅ das ist deine komplette Umfrage-Historie
+  last: data,                      // optional: letztes Ergebnis separat
+  createdAt: serverTimestamp(),
+  page: location.href,
+  ua: navigator.userAgent
+});
+
 
   </script>
 
