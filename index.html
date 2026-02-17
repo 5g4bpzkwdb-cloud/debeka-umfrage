@@ -1128,5 +1128,64 @@
     }
 
   </script>
+
+  <!-- dein kompletter Website Inhalt -->
+
+  <!-- Firebase Script HIER rein -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFFwh67DFW4b3aKwPRlit7GRvH0bKlDG8",
+      authDomain: "debeka-umfrage.firebaseapp.com",
+      projectId: "debeka-umfrage",
+      storageBucket: "debeka-umfrage.firebasestorage.app",
+      messagingSenderId: "295363329740",
+      appId: "1:295363329740:web:fd2e3f6ee264bb9a208c69"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    window.db = getFirestore(app);
+    // ===== Survey -> Firestore speichern =====
+const form = document.getElementById("surveyForm");
+
+form.addEventListener("submit", async (e) => {
+  // Wenn dein bestehender Code bereits e.preventDefault() nutzt,
+  // dann lass diese Zeile drin – sonst speichert es nicht stabil.
+  e.preventDefault();
+
+  const formData = new FormData(form);
+
+  // Radio-Gruppen / Mehrfachwerte sauber sammeln
+  const data = {};
+  for (const [k, v] of formData.entries()) {
+    if (data[k]) {
+      // falls Mehrfachauswahl irgendwann vorkommt
+      data[k] = Array.isArray(data[k]) ? [...data[k], v] : [data[k], v];
+    } else {
+      data[k] = v;
+    }
+  }
+
+  try {
+    await addDoc(collection(window.db, "responses"), {
+      answers: data,
+      createdAt: serverTimestamp(),
+      page: location.href,
+      ua: navigator.userAgent
+    });
+    console.log("✅ Firestore gespeichert", data);
+  } catch (err) {
+    console.error("❌ Firestore Fehler:", err);
+    alert("Speichern fehlgeschlagen (Cloud). Öffne die Konsole (F12) für Details.");
+  }
+});
+
+  </script>
+
+
+
 </body>
 </html>
