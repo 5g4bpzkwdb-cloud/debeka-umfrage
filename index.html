@@ -1,0 +1,1132 @@
+
+
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DeBeKa – QR-Flow (Umfrage → Q&A → Erklärungen) + Admin-Übersicht</title>
+  <style>
+    :root{
+      --debeka-blue:#1e9ad6;
+      --debeka-blue-soft:rgba(30,154,214,.18);
+      --bg:#07101a;
+      --text:#eaf3ff;
+      --muted:#b8c9e6;
+      --line:rgba(255,255,255,.12);
+      --shadow:0 16px 50px rgba(0,0,0,.35);
+      --radius:18px;
+      --radius2:14px;
+      --max:1100px;
+      --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      background:
+        radial-gradient(1100px 650px at 12% -10%, var(--debeka-blue-soft), transparent 60%),
+        radial-gradient(900px 600px at 90% 0%, rgba(30,154,214,.10), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.5;
+    }
+    .wrap{max-width:var(--max); margin:0 auto; padding:28px 18px 60px;}
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px; padding:18px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(11,23,38,.92), rgba(10,20,34,.78));
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      position:sticky; top:14px;
+      backdrop-filter: blur(10px);
+      z-index:10;
+    }
+    @media (max-width: 860px){ header{position:relative; top:auto} }
+    .brand{display:flex; align-items:center; gap:12px;}
+    .brand h1{font-size:15px; margin:0; letter-spacing:.2px}
+    .brand p{margin:2px 0 0; font-size:12px; color:var(--muted)}
+    .logoImg{height:44px; width:auto; display:block; filter: drop-shadow(0 10px 24px rgba(30,154,214,.18));}
+
+    nav{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+    .tabbtn{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:13px;
+      transition:.18s ease;
+    }
+    .tabbtn:hover{transform: translateY(-1px); background:rgba(255,255,255,.06)}
+    .tabbtn[aria-selected="true"]{
+      background:linear-gradient(135deg, rgba(30,154,214,.20), rgba(255,255,255,.04));
+      border-color:rgba(30,154,214,.55);
+    }
+    .tabbtn:disabled{opacity:.45; cursor:not-allowed}
+
+    .hero{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap:16px;
+      align-items:stretch;
+    }
+    @media (max-width: 860px){ .hero{grid-template-columns:1fr} }
+
+    .card{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(11,23,38,.82), rgba(10,20,34,.74));
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card .inner{padding:18px;}
+    .card h2{margin:0 0 8px; font-size:20px; letter-spacing:.2px}
+    .card p{margin:0 0 12px; color:var(--muted)}
+
+    .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+    .chip{
+      font-size:12px; color:var(--text);
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      user-select:none;
+    }
+
+    .aside{display:flex; flex-direction:column; gap:12px; height:100%;}
+    .mini{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+    }
+    .mini h3{margin:0 0 8px; font-size:14px}
+    .mini p{margin:0; color:var(--muted); font-size:13px}
+    .note{
+      margin-top:10px;
+      font-size:12px;
+      color:rgba(234,243,255,.90);
+      border-left:3px solid rgba(30,154,214,.75);
+      padding-left:10px;
+      word-break:break-word;
+    }
+
+    main{margin-top:16px}
+    .section{display:none; animation: fade .18s ease;}
+    .section.active{display:block}
+    @keyframes fade{from{opacity:.6; transform: translateY(4px)} to{opacity:1; transform: translateY(0)}}
+
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+    @media (max-width: 860px){ .grid{grid-template-columns:1fr} }
+
+    .formRow{display:flex; gap:10px; flex-wrap:wrap}
+    label{display:block; font-weight:750; font-size:13px; margin-bottom:6px}
+    .field{
+      flex:1;
+      min-width: 220px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      border-radius:var(--radius2);
+      padding:12px;
+      outline:none;
+      transition:.15s ease;
+    }
+    .field:focus{border-color:rgba(30,154,214,.65); box-shadow:0 0 0 4px rgba(30,154,214,.18)}
+    .hint{font-size:12px; color:var(--muted); margin-top:6px}
+
+    .q{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:var(--radius);
+      padding:14px;
+      margin-bottom:12px;
+    }
+    .qhead{display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:10px;}
+    .qtitle{margin:0; font-size:14px; font-weight:800}
+    .qtag{
+      font-size:11px;
+      padding:5px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(30,154,214,.12);
+      white-space:nowrap;
+    }
+    .options{display:grid; gap:8px}
+    .opt{
+      display:flex; gap:10px; align-items:flex-start;
+      border:1px solid rgb(255, 255, 255);
+      background:rgba(0,0,0,.12);
+      padding:10px;
+      border-radius:14px;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+    .opt:hover{border-color:rgba(255,255,255,.14); transform: translateY(-1px)}
+    .opt input{margin-top:2px}
+    .opt span{font-size:13px}
+    .opt small{display:block; margin-top:2px; color:var(--muted); font-size:12px}
+
+    textarea.field{min-height:96px; resize:vertical}
+
+    .btnRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; align-items:center}
+    .btn{
+      border:1px solid rgba(30,154,214,.60);
+      background:linear-gradient(135deg, rgba(30,154,214,.24), rgba(255,255,255,.04));
+      color:var(--text);
+      padding:11px 14px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:850;
+      font-size:13px;
+      transition:.15s ease;
+      text-decoration:none;
+      display:inline-block;
+    }
+    .btn:hover{transform: translateY(-1px)}
+    .btn.secondary{
+      border-color:rgba(255,255,255,.18);
+      background:rgba(255,255,255,.04);
+      font-weight:700;
+    }
+    .btn.danger{
+      border-color: rgba(255,107,107,.5);
+      background: rgba(255,107,107,.12);
+    }
+
+    .status{margin-top:8px; font-size:13px; color:rgba(234,243,255,.9);}
+
+    .kpi{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px;}
+    @media (max-width: 860px){ .kpi{grid-template-columns:1fr} }
+    .kpi .box{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:var(--radius);
+      padding:14px;
+    }
+    .kpi .box strong{display:block; font-size:18px}
+    .kpi .box span{color:var(--muted); font-size:12px}
+
+    details{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:var(--radius);
+      padding:12px;
+      margin-bottom:10px;
+    }
+    summary{cursor:pointer; list-style:none; font-weight:850; font-size:14px; outline:none;}
+    summary::-webkit-details-marker{display:none}
+    .faqMeta{margin-top:6px; font-size:12px; color:var(--muted)}
+    .faqBody{margin-top:10px; color:rgba(234,243,255,.92); font-size:13px}
+
+    .footer{margin-top:18px; color:rgba(234,243,255,.8); font-size:12px; text-align:center;}
+    .badge{
+      display:inline-block;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(30,154,214,.55);
+      background:rgba(30,154,214,.14);
+      margin-left:6px;
+      font-weight:750;
+    }
+
+    .toast{
+      position:fixed; right:14px; bottom:14px;
+      border:1px solid var(--line);
+      background:rgba(11,23,38,.92);
+      backdrop-filter: blur(10px);
+      border-radius:14px;
+      padding:10px 12px;
+      box-shadow:var(--shadow);
+      max-width:360px;
+      display:none;
+    }
+    .toast.show{display:block; animation: pop .16s ease}
+    @keyframes pop{from{opacity:.3; transform: translateY(6px)} to{opacity:1; transform: translateY(0)}}
+
+    /* QR-mode visuals */
+    .qrBanner{
+      margin-top:14px;
+      border:1px solid rgba(30,154,214,.35);
+      background:rgba(30,154,214,.10);
+      border-radius:14px;
+      padding:10px 12px;
+      color:rgba(234,243,255,.95);
+      display:none;
+    }
+    .qrBanner strong{color:#fff}
+    .qrOnly{display:none;}
+    .adminOnly{display:block;}
+    body.qr-mode .adminOnly{display:none !important;}
+    body.qr-mode .qrOnly{display:block;}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <img class="logoImg" src="https://upload.wikimedia.org/wikipedia/commons/8/87/Debeka.svg" alt="Debeka Logo" />
+        <div>
+          <h1>Umfrage → Q&A → Erklärungen</h1>
+          <p class="adminOnly">Admin-Übersicht (du siehst alles). QR-Nutzer sehen nur den Flow.</p>
+        </div>
+      </div>
+
+      <nav aria-label="Navigation" class="adminOnly">
+        <button class="tabbtn" data-tab="overview" aria-selected="true">Übersicht</button>
+        <button class="tabbtn" data-tab="survey" aria-selected="false">Umfrage</button>
+        <button class="tabbtn" data-tab="qna" aria-selected="false" id="qnaTab" disabled>Q&A</button>
+        <button class="tabbtn" data-tab="explain" aria-selected="false" id="explainTab" disabled>Erklärungen</button>
+        <button class="tabbtn" data-tab="results" aria-selected="false">Auswertung</button>
+      </nav>
+
+      <!-- QR progress (only in QR mode) -->
+      <nav class="qrOnly" aria-label="QR Fortschritt" style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+        <span class="chip" id="qrStepChip">Schritt 1/3: Umfrage</span>
+      </nav>
+    </header>
+
+    <div class="qrBanner" id="qrBanner">
+      <strong>Erst Umfrage, dann Q&A, dann Erklärungen.</strong> 
+    </div>
+
+    <!-- ADMIN OVERVIEW -->
+    <section class="hero adminOnly" id="adminHero">
+      <div class="card">
+        <div class="inner">
+          <h2>Admin-Übersicht</h2>
+          <p>Du kannst alles sehen: Umfrage, Q&A-Logik, Erklärungen und Auswertungen. QR-Nutzer sehen nur den geführten Ablauf.</p>
+          <div class="chips">
+            <span class="chip">🔗 QR-Link: <span id="qrLinkInline"></span></span>
+            <span class="chip">🧩 Platzhalter-Inhalte</span>
+            <span class="chip">📊 Lokale Auswertung</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="aside">
+        <div class="mini">
+          <h3>QR-Link (für Flyer)</h3>
+          <p>Setze den QR-Code auf:</p>
+          <div class="note" id="qrLinkBox">–</div>
+          <p class="hint" style="margin-top:8px;">Wichtig: <strong>#qr</strong> aktiviert den geführten Flow.</p>
+        </div>
+
+        <div class="mini">
+          <h3>Reset (für Tests)</h3>
+          <p>Löscht lokale Daten (nur dein Browser):</p>
+          <div class="btnRow" style="margin-top:10px;">
+            <button class="btn danger" type="button" id="resetAll">Lokale Daten löschen</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main>
+      <!-- ÜBERSICHT (ADMIN) -->
+      <section id="overview" class="section active adminOnly">
+        <div class="grid">
+          <div class="card">
+            <div class="inner">
+              <h2>Was QR-Nutzer sehen</h2>
+              <p>Linearer Ablauf:</p>
+              <div class="chips">
+                <span class="chip">1) Umfrage</span>
+                <span class="chip">2) Q&A</span>
+                <span class="chip">3) Erklärungen</span>
+              </div>
+              <div class="note" style="margin-top:12px;">
+                Inhalte sind noch Platzhalter. Später ersetzt ihr nur die Texte in <strong>QNA_LIBRARY</strong> und <strong>EXPLAIN_LIBRARY</strong>.
+              </div>
+              <div class="btnRow">
+                <button class="btn secondary" type="button" id="adminJumpSurvey">Zur Umfrage</button>
+                <button class="btn secondary" type="button" id="adminJumpResults">Zur Auswertung</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="inner">
+              <h2>Live-Kurzauswertung (lokal)</h2>
+              <div class="kpi">
+                <div class="box"><strong id="kpiCount">0</strong><span>Antworten</span></div>
+                <div class="box"><strong id="kpiTopBausparen">–</strong><span>Top: Bausparen</span></div>
+                <div class="box"><strong id="kpiTopInsurance">–</strong><span>Top: Versicherung</span></div>
+              </div>
+              <div class="hint" style="margin-top:10px;">Nur zur Vorschau (später Backend möglich).</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1) UMFRAGE -->
+      <section id="survey" class="section">
+        <div class="grid">
+          <div class="card">
+            <div class="inner">
+              <h2>Umfrage</h2>
+              <p>Nach dem Absenden geht es automatisch weiter zum Q&A.</p>
+
+              <form id="surveyForm" novalidate>
+                <div class="formRow">
+                  <div style="flex:1; min-width:220px;">
+                    <label for="ageGroup">Altersgruppe</label>
+                    <select class="field" id="ageGroup" name="ageGroup" required>
+                      <option value="" selected disabled>Bitte wählen…</option>
+                      <option value="18-20">18–20</option>
+                      <option value="21-23">21-23</option>
+                      <option value="24-26">24-26</option>
+                      <option value="27+">27+</option>
+                    </select>
+                  </div>
+
+                  <div style="flex:1; min-width:220px;">
+                    <label for="status">Aktueller Status</label>
+                    <select class="field" id="status" name="status" required>
+                      <option value="" selected disabled>Bitte wählen…</option>
+                      <option value="student">Student/in</option>
+                      <option value="azubi">Ausbildung</option>
+                      <option value="jobstart">Berufseinstieg (0–2 Jahre)</option>
+                      <option value="youngpro">Young Professional</option>
+                      <option value="other">Sonstiges</option>
+                    </select>
+                  </div>
+
+                  <div style="flex:1; min-width:220px;">
+                    <label for="source">Wie bist du auf die Umfrage gekommen?</label>
+                    <select class="field" id="source" name="source" required>
+                      <option value="" selected disabled>Bitte wählen…</option>
+                      <option value="flyer">Flyer</option>
+                      <option value="qr">Direkter QR-Code</option>
+                    
+                    </select>
+                  </div>
+                </div>
+
+                <div class="q">
+                  <div class="qhead">
+                    <p class="qtitle">1) Wie wichtig ist dir aktuell der Aufbau von Vermögen für deine Zukunft?</p>
+
+                  </div>
+                  <div class="options">
+                    <label class="opt"><input type="radio" name="goal" value="ruecklagen" required>
+                      <span>Sehr wichtig – ich spare regelmäßig</span>
+                    </label>
+                    <label class="opt"><input type="radio" name="goal" value="wohnen">
+                      <span>Wichtig – aber ich habe noch keinen festen Plan</span>
+                    </label>
+                    <label class="opt"><input type="radio" name="goal" value="vorsorge">
+                      <span>Noch nicht so wichtig</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="q">
+                  <div class="qhead">
+                    <p class="qtitle">2) Weißt du, was ein Bausparvertrag ist und welche Vorteile er beim späteren Wohnen haben kann?</p>
+                  </div>
+                  <div class="options">
+                    <label class="opt"><input type="radio" name="bausparen_interest" value="unsicher">
+                      <span>Ja, kenne ich gut</span>
+                    </label>
+                    <label class="opt"><input type="radio" name="bausparen_interest" value="sehr" required>
+                      <span>Schon mal gehört</span>
+                    </label>
+                    <label class="opt"><input type="radio" name="bausparen_interest" value="eher">
+                      <span>Nein, noch nicht</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="q">
+                  <div class="qhead">
+                    <p class="qtitle">3) Nutzt du bereits vermögenswirksame Leistungen oder staatliche Förderungen (z. B. Wohnungsbauprämie)?</p>
+                    
+                  </div>
+                  <div class="options">
+                    <label class="opt"><input type="radio" name="bausparen_barrier" value="wissen" required>
+                      <span>Ja</span>
+                    </label>
+                    <label class="opt"><input type="radio" name="bausparen_barrier" value="budget">
+                      <span>Nein, aber interessiert mich</span>
+                    </label>
+                    <label class="opt"><input type="radio" name="bausparen_barrier" value="lohnt">
+                      <span>Nein, kenne ich nicht</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="q">
+                  <div class="qhead">
+                    <p class="qtitle">4) Welche Versicherungen hast du aktuell?</p>
+                    
+                  </div>
+                  <div class="options" id="insuranceOptions">
+                    <label class="opt"><input type="radio" name="insurance_priorities" value="Mehrere">
+                      <span>Mehrere wichtige (z. B. Haftpflicht etc.)</span>
+                    </label>
+                    <label class="opt"><input type="radio" name="insurance_priorities" value="wenig">
+                      <span>Nur wenige</span>
+                    </label>
+                    <label class="opt"><input type="radio" name="insurance_priorities" value="keine" required>
+                      <span>Noch keine / unsicher</span>
+                    </label>
+                  </div>
+                  
+                </div>
+
+                <div class="q">
+                  <div class="qhead">
+                    <p class="qtitle">5) Hast du einen Plan, wie du deine finanzielle Zukunft (Wohnen, Absicherung, Sparen) gestalten möchtest?</p>
+                   
+                  </div>
+                  <div class="options">
+                    <label class="opt"><input type="radio" name="contact_pref" value="kurz" required>
+                      <span>Ja, klarer Plan</span>
+                    </label>
+                    <label class="opt"><input type="radio" name="contact_pref" value="vergleich">
+                      <span>Teilweise</span>
+                    </label>
+                    <label class="opt"><input type="radio" name="contact_pref" value="beratung">
+                      <span>Nein, brauche Orientierung</span>
+                    </label>
+                  </div>
+                </div>
+
+              
+
+                <div class="btnRow">
+                  <button type="submit" class="btn">Umfrage abschicken</button>
+                  <button type="button" class="btn secondary adminOnly" id="fillDemo">Demo ausfüllen</button>
+                </div>
+
+                <div class="status" id="surveyStatus" role="status" aria-live="polite"></div>
+              </form>
+            </div>
+          </div>
+
+          <div class="card adminOnly">
+            <div class="inner">
+              <h2>Admin-Hinweis</h2>
+              <p>Im QR-Modus ist die Navigation ausgeblendet. Hier (Admin) kannst du alles direkt anspringen.</p>
+              <div class="note">QR-Link: <strong id="qrLinkRepeat"></strong></div>
+            </div>
+          </div>
+
+          <div class="card qrOnly">
+            <div class="inner">
+              <h2>Schritt 1/3</h2>
+              <p>Bitte fülle die Umfrage aus. Danach bekommst du passende Fragen und Erklärungen.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2) Q&A -->
+      <section id="qna" class="section">
+        <div class="grid">
+          <div class="card">
+            <div class="inner">
+              <h2>Q&A</h2>
+              <p id="profileLine" class="note" style="border-left-color:rgba(30,154,214,.75)">–</p>
+              <div id="qnaList"></div>
+
+              <div class="btnRow">
+                <button class="btn" type="button" id="toExplain">Weiter zu Erklärungen</button>
+                <button class="btn secondary adminOnly" type="button" id="backToSurvey">Zur Umfrage</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card qrOnly">
+            <div class="inner">
+              <h2>Schritt 2/3</h2>
+              <p>Hier sind oft gestellte Fragen.</p>
+            </div>
+          </div>
+
+          <div class="card adminOnly">
+            <div class="inner">
+              <h2>Admin: Inhalte tauschen</h2>
+              <p>Die Texte stehen in <strong>QNA_LIBRARY</strong>. Nur dort ersetzen – Logik bleibt gleich.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3) ERKLÄRUNGEN -->
+      <section id="explain" class="section">
+        <div class="grid">
+          <div class="card">
+            <div class="inner">
+              <h2>Erklärungen & Ausführungen</h2>
+              <p>Hier findest du ausführliche Erklärungen zu den Themen</p>
+
+              <div id="explainList"></div>
+
+              <div class="btnRow">
+                <button class="btn secondary adminOnly" type="button" id="backToQna">Zurück zu Q&A</button>
+                <button class="btn secondary adminOnly" type="button" id="toResults">Zur Auswertung</button>
+                <button class="btn secondary qrOnly" type="button" id="qrRestart">Zurück zum Start</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card qrOnly">
+            <div class="inner">
+              <h2>Schritt 3/3</h2>
+              <p>Zum Schluss bekommst du Erklärungen. Danach bist du fertig.</p>
+            </div>
+          </div>
+
+          <div class="card adminOnly">
+            <div class="inner">
+              <h2>Admin: Inhalte tauschen</h2>
+              <p>Die Texte stehen in <strong>EXPLAIN_LIBRARY</strong>. Nur dort ersetzen – Logik bleibt gleich.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AUSWERTUNG (ADMIN) -->
+      <section id="results" class="section adminOnly">
+        <div class="grid">
+          <div class="card">
+            <div class="inner">
+              <h2>Auswertung (lokal)</h2>
+              <div class="kpi">
+                <div class="box"><strong id="rCount">0</strong><span>Antworten insgesamt</span></div>
+                <div class="box"><strong id="rBausparen">–</strong><span>Top (Bausparen)</span></div>
+                <div class="box"><strong id="rInsurance">–</strong><span>Top (Versicherung)</span></div>
+              </div>
+
+              <div style="margin-top:16px">
+                <label for="exportBox">Export (JSON)</label>
+                <textarea id="exportBox" class="field" readonly></textarea>
+                <div class="btnRow">
+                  <button class="btn secondary" type="button" id="copyJson">JSON kopieren</button>
+                  <button class="btn secondary" type="button" id="downloadJson">JSON herunterladen</button>
+                </div>
+                <div class="status" id="exportStatus" role="status" aria-live="polite"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="inner">
+              <h2>Admin-Navigation</h2>
+              <div class="btnRow">
+                <button class="btn secondary" type="button" id="adminToOverview">Zur Übersicht</button>
+                <button class="btn secondary" type="button" id="adminToSurvey">Zur Umfrage</button>
+              </div>
+              <div class="note">Diese Auswertung ist lokal (Browser). Später könnt ihr das auf ein Backend umstellen.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">
+        Private Demo • Stand: <span id="today"></span>
+        <span class="badge">QR-Flow + Admin</span>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // -----------------------------
+    // Storage keys (lokal)
+    // -----------------------------
+    const STORE_ANSWERS = "debeka_answers_v3";
+    const STORE_LAST = "debeka_last_answer_v3";
+
+    // -----------------------------
+    // Q&A library (PLATZHALTER!)
+    // -----------------------------
+    
+
+    // -----------------------------
+    // EXPLAIN library (PLATZHALTER!)
+    // -> "Erklärungen & Ausführungen" nach dem Q&A
+    // -----------------------------
+    const EXPLAIN_LIBRARY = {
+      base: [
+        {
+          title: "[PLATZHALTER] Kurz-Guide: So triffst du Entscheidungen",
+          body: "[PLATZHALTER] 1) Ziel klären  2) Budget prüfen  3) Risiken priorisieren  4) Optionen vergleichen  5) Entscheidung dokumentieren."
+        }
+      ],
+      byBarrier: {
+        wissen: {
+          title: "[PLATZHALTER] Begriffe einfach erklärt",
+          body: "[PLATZHALTER] Glossar: Sparphase, Zuteilung, Darlehen, Abschlusskosten, Effektivkosten…"
+        },
+        budget: {
+          title: "[PLATZHALTER] Budget-Planung",
+          body: "[PLATZHALTER] Beispiel: fixe/variable Kosten + Sparrate + Puffer. Was heißt „flexibel“ in der Praxis?"
+        },
+        lohnt: {
+          title: "[PLATZHALTER] Lohnt es sich? – Bewertungsraster",
+          body: "[PLATZzPLATZHALTER] Faktoren: Gebühren, Zinserwartung, Zeit, Planbarkeit, Alternativen."
+        },
+        flex: {
+          title: "[PLATZHALTER] Flexibilität & Laufzeit",
+          body: "[PLATZHALTER] Welche Stellschrauben gibt es typischerweise (Sparrate pausieren/anpassen etc.)?"
+        }
+      },
+      byInsurance: {
+        haftpflicht: {
+          title: "[PLATZHALTER] Haftpflicht – typische Fälle",
+          body: "[PLATZHALTER] Beispiele aus Alltag/Studium + worauf bei Deckungssumme/Ausschlüssen achten."
+        },
+        bu: {
+          title: "[PLATZHALTER] BU – worum geht’s wirklich?",
+          body: "[PLATZHALTER] Absicherung des Einkommens + wichtige Begriffe + wann Beratung sinnvoll ist."
+        },
+        reise: {
+          title: "[PLATZHALTER] Auslandsreise-KV – Checkliste",
+          body: "[PLATZHALTER] Leistungen, Dauer, Ausschlüsse, Notfallnummer, Selbstbehalt…"
+        }
+      }
+    };
+
+    // -----------------------------
+    // Helpers
+    // -----------------------------
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    function toast(msg){
+      const t = $("#toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(()=>t.classList.remove("show"), 2600);
+    }
+
+    function readAll(){
+      try{ return JSON.parse(localStorage.getItem(STORE_ANSWERS) || "[]"); } catch { return []; }
+    }
+    function writeAll(arr){
+      localStorage.setItem(STORE_ANSWERS, JSON.stringify(arr));
+      updateResultsUI();
+      updateOverviewKpis();
+    }
+
+    function getLastAnswer(){
+      try{ return JSON.parse(localStorage.getItem(STORE_LAST) || "null"); }catch{ return null; }
+    }
+    function setLastAnswer(a){ localStorage.setItem(STORE_LAST, JSON.stringify(a)); }
+
+    function freqTop(values){
+      const map = new Map();
+      values.forEach(v=>{
+        if(v===undefined || v===null || v==="" ) return;
+        if(Array.isArray(v)){ v.forEach(x => map.set(x, (map.get(x)||0)+1)); }
+        else { map.set(v, (map.get(v)||0)+1); }
+      });
+      let best=null, bestN=0;
+      for(const [k,n] of map.entries()){ if(n>bestN){ best=k; bestN=n; } }
+      return best ? `${best} (${bestN})` : "–";
+    }
+
+    function safeDownload(filename, text){
+      const blob = new Blob([text], {type:"application/json;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a);
+      a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 800);
+    }
+
+    // -----------------------------
+    // Tabs / sections
+    // -----------------------------
+    const tabButtons = $$(".tabbtn");
+    const sections = $$(".section");
+
+    function showTab(name){
+      sections.forEach(s => s.classList.toggle("active", s.id===name));
+      tabButtons.forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab===name)));
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+    tabButtons.forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        if(btn.disabled) return;
+        showTab(btn.dataset.tab);
+      });
+    });
+
+    // -----------------------------
+    // QR mode detection
+    // -----------------------------
+    function isQRMode(){
+      const params = new URLSearchParams(location.search);
+      return location.hash.toLowerCase().includes("qr") || params.get("qr")==="1";
+    }
+
+    function setQRStep(step){
+      const chip = $("#qrStepChip");
+      if(!chip) return;
+      const labels = {
+        1: "Schritt 1/3: Umfrage",
+        2: "Schritt 2/3: Q&A",
+        3: "Schritt 3/3: Erklärungen"
+      };
+      chip.textContent = labels[step] || "Schritt";
+    }
+
+    // -----------------------------
+    // Survey: limit insurance to 2
+    // -----------------------------
+    const insWrap = $("#insuranceOptions");
+    if(insWrap) insWrap.addEventListener("change", (e)=>{
+      const checks = $$("input[type='checkbox'][name='insurance_priorities']", $("#insuranceOptions"));
+      const picked = checks.filter(c=>c.checked);
+      if(picked.length > 2){
+        e.target.checked = false;
+        toast("Maximal 2 auswählen 🙂");
+      }
+    });
+
+    // -----------------------------
+    // Q&A generation
+    // -----------------------------
+    function buildProfileText(a){
+      const ins = (a.insurance_priorities||[]).join(", ") || "–";
+      const src = a.source ? ` · Quelle: ${a.source}` : "";
+      return `Bausparen: ${a.bausparen_interest || "–"} · Hürde: ${a.bausparen_barrier || "–"} · Versicherungen: ${ins}${src}`;
+    }
+
+    
+    function pickQnaForAnswer(a){
+  // IMMER die gleichen 4 Fragen anzeigen (unabhängig von Antworten)
+  return [
+    {
+      cat: "Bauchsparen",
+      q: "Was ist ein Bausparvertrag und welchen Nutzen hat er?",
+      a: "Ein Bausparvertrag kombiniert Sparen und Finanzierung in einem Produkt. Du sparst zunächst regelmäßig Geld an und sicherst dir dadurch später ein zinsgünstiges Darlehen für wohnwirtschaftliche Zwecke, z. B. Immobilienkauf, Renovierung oder Modernisierung. Der Nutzen liegt vor allem in planbaren Zinsen, langfristiger Sicherheit und möglichen staatlichen Förderungen. Besonders für junge Erwachsene kann er helfen, frühzeitig Eigenkapital aufzubauen und sich stabile Finanzierungskonditionen für die Zukunft zu sichern.."
+    },
+    {
+      cat: "Staatliche Förderung",
+      q: "Welche staatlichen Förderungen gibt es beim Vermögensaufbau und wie funktionieren sie?",
+      a: "Beim Vermögensaufbau kannst du unter bestimmten Voraussetzungen staatliche Förderungen nutzen, z. B. die Wohnungsbauprämie oder die Arbeitnehmer-Sparzulage. Die Wohnungsbauprämie unterstützt dich beim Sparen für wohnwirtschaftliche Zwecke wie einen Bausparvertrag und erhöht deine Einzahlungen durch einen staatlichen Zuschuss. Die Arbeitnehmer-Sparzulage fördert vermögenswirksame Leistungen vom Arbeitgeber, wenn diese in geeignete Sparformen eingezahlt werden. Der Nutzen besteht darin, dass du zusätzliches Geld vom Staat erhältst und dadurch schneller Vermögen aufbauen kannst."
+    },
+    {
+      cat: "Vermögenswirksame Leistungen",
+      q: "Was sind vermögenswirksame Leistungen und wie kannst du davon profitieren?",
+      a: "Vermögenswirksame Leistungen (VL) sind Geldbeträge, die dein Arbeitgeber zusätzlich zu deinem Gehalt in einen Sparvertrag einzahlen kann. Diese können z. B. in einen Bausparvertrag, Fonds oder andere geförderte Sparformen fließen. Der Nutzen liegt darin, dass du mit Unterstützung deines Arbeitgebers Vermögen aufbaust und unter bestimmten Voraussetzungen zusätzlich staatliche Förderungen wie die Arbeitnehmer-Sparzulage erhalten kannst. Um VL zu bekommen, musst du deinen Arbeitgeber danach fragen und einen passenden Sparvertrag auswählen."
+    },
+    {
+      cat: "Versicherungen",
+      q: "Warum sind Versicherungen wichtig und welchen Nutzen haben sie?",
+      a: "Versicherungen dienen dazu, finanzielle Risiken abzusichern und dich vor unerwarteten Kosten zu schützen. Sie funktionieren nach dem Prinzip der Solidargemeinschaft: Viele zahlen Beiträge ein, damit im Schadensfall einzelne finanziell unterstützt werden können. Der Nutzen besteht darin, dass große finanzielle Belastungen, z. B. durch Schäden, Unfälle oder Haftungsfälle, nicht allein getragen werden müssen. Besonders grundlegende Versicherungen können helfen, deine finanzielle Sicherheit zu erhöhen und langfristige Planung zu ermöglichen, beispielsweise eine private Haftpflichtversicherung zum Schutz vor Schadensersatzforderungen oder eine Berufsunfähigkeitsversicherung zur Absicherung deines Einkommens."
+    },
+    {
+      cat: "Beratung",
+      q: "Intersse geweckt?",
+      a: "Für einen Termin zur individuellen Beratung der Debeka erkundigen Sie sich unter: 0800 888008200",
+    },
+  ];
+}
+
+
+    function renderQna(a){
+      $("#profileLine").textContent = buildProfileText(a);
+      const items = pickQnaForAnswer(a);
+
+      const root = $("#qnaList");
+      root.innerHTML = "";
+      items.forEach(item=>{
+        const d = document.createElement("details");
+        const s = document.createElement("summary");
+        s.textContent = item.q;
+
+        const meta = document.createElement("div");
+        meta.className = "faqMeta";
+        meta.textContent = `Kategorie: ${item.cat}`;
+
+        const body = document.createElement("div");
+        body.className = "faqBody";
+        body.textContent = item.a;
+
+        d.appendChild(s);
+        d.appendChild(meta);
+        d.appendChild(body);
+        root.appendChild(d);
+      });
+    }
+
+    function unlockNextTabs(){
+      $("#qnaTab").disabled = false;
+      $("#explainTab").disabled = false;
+    }
+
+    // -----------------------------
+    // Explain generation
+    // -----------------------------
+    function renderExplain() {
+
+  const root = document.getElementById("explainList");
+  root.innerHTML = "";
+
+  const fixedExplain = [
+
+    {
+      
+      title: "Staatliche Förderungen – wie sie funktionieren und wie du sie nutzt",
+      text: "Viele junge Erwachsene wissen nicht, dass der Staat aktiv beim Vermögensaufbau unterstützt. Zu den wichtigsten Förderungen gehören die Wohnungsbauprämie und die Arbeitnehmer-Sparzulage. Die Wohnungsbauprämie ist ein staatlicher Zuschuss, der gewährt wird, wenn du regelmäßig Geld in einen geeigneten Sparvertrag, zum Beispiel einen Bausparvertrag, einzahlst. Ziel ist es, dich beim langfristigen Aufbau von Eigenkapital für wohnwirtschaftliche Zwecke zu unterstützen. Die Arbeitnehmer-Sparzulage hingegen fördert vermögenswirksame Leistungen (VL), also Geld, das dein Arbeitgeber zusätzlich zum Gehalt in einen Sparvertrag einzahlen kann. Damit du diese Förderungen erhältst, müssen bestimmte Voraussetzungen erfüllt sein, wie beispielsweise Einkommensgrenzen oder die Nutzung eines zugelassenen Vertrags. Die Beantragung erfolgt meist nicht direkt über einen separaten Antrag, sondern wird über deine jährliche Steuererklärung oder automatisch über den Anbieter abgewickelt. Gerade für junge Erwachsene lohnt sich ein genauer Blick auf diese Förderungen, da sie eine Möglichkeit bieten, mit relativ kleinen eigenen Beiträgen und zusätzlicher Unterstützung durch Staat und Arbeitgeber langfristig Vermögen aufzubauen."
+
+
+    },
+
+    {
+      title: "Vermögenswirksame Leistungen – wie sie funktionieren und wie du sie optimal nutzt",
+      text: "Vermögenswirksame Leistungen (VL) sind ein zusätzlicher Geldbetrag, den dein Arbeitgeber freiwillig oder tariflich geregelt für dich sparen kann. Dieses Geld wird nicht direkt ausgezahlt, sondern in einen geeigneten Sparvertrag eingezahlt, zum Beispiel einen Bausparvertrag oder eine andere geförderte Anlageform. Ziel der VL ist es, Arbeitnehmer beim langfristigen Vermögensaufbau zu unterstützen. Um VL zu erhalten, musst du zunächst prüfen, ob dein Arbeitgeber diese anbietet und anschließend einen passenden Vertrag auswählen, in den die Beiträge eingezahlt werden können. Häufig ist dafür ein einfacher Antrag beim Arbeitgeber notwendig. Unter bestimmten Voraussetzungen kannst du zusätzlich staatliche Förderung in Form der Arbeitnehmer-Sparzulage erhalten, wenn dein Einkommen unter festgelegten Grenzen liegt. Für junge Erwachsene sind VL besonders interessant, da sie oft ohne großen eigenen finanziellen Aufwand genutzt werden können und einen frühen Einstieg in regelmäßiges Sparen ermöglichen. Wichtig ist dabei, sich frühzeitig zu informieren, da viele Berufseinsteiger diese Möglichkeit nicht kennen und dadurch finanzielle Vorteile ungenutzt bleiben."
+    },
+
+  ];
+
+  fixedExplain.forEach(item => {
+
+    const box = document.createElement("div");
+    box.className = "faqBody";
+
+    const h = document.createElement("h3");
+    h.textContent = item.title;
+
+    const p = document.createElement("p");
+    p.textContent = item.text;
+
+    box.appendChild(h);
+    box.appendChild(p);
+
+    root.appendChild(box);
+
+  });
+
+}
+
+
+    // -----------------------------
+    // Submit survey
+    // -----------------------------
+    $("#surveyForm").addEventListener("submit", (e)=>{
+      e.preventDefault();
+      const form = e.target;
+      const fd = new FormData(form);
+
+      const payload = {
+        ts: new Date().toISOString(),
+        ageGroup: fd.get("ageGroup") || "",
+        status: fd.get("status") || "",
+        source: fd.get("source") || "",
+        goal: fd.get("goal") || "",
+        bausparen_interest: fd.get("bausparen_interest") || "",
+        bausparen_barrier: fd.get("bausparen_barrier") || "",
+        insurance_priorities: fd.getAll("insurance_priorities"),
+        contact_pref: fd.get("contact_pref") || "",
+        openText: (fd.get("openText") || "").toString().trim()
+      };
+
+      const required = ["ageGroup","status","source","goal","bausparen_interest","bausparen_barrier","contact_pref"];
+      const missing = required.filter(k => !payload[k]);
+      if(missing.length){
+        $("#surveyStatus").textContent = "Bitte fülle alle Pflichtfelder aus.";
+        toast("Pflichtfelder fehlen");
+        return;
+      }
+
+      const all = readAll();
+      all.push(payload);
+      writeAll(all);
+      setLastAnswer(payload);
+
+      $("#surveyStatus").textContent = "Danke! Weiter zum Q&A …";
+      toast("Gespeichert ✅");
+
+      unlockNextTabs();
+      renderQna(payload);
+      renderExplain(payload);
+      updateResultsUI();
+      updateOverviewKpis();
+
+      if(isQRMode()){
+        setQRStep(2);
+      }
+      showTab("qna");
+      form.reset();
+    });
+
+    // admin demo fill
+    const demoBtn = $("#fillDemo");
+    if(demoBtn){
+      demoBtn.addEventListener("click", ()=>{
+        $("#ageGroup").value = "19-22";
+        $("#status").value = "student";
+        $$("input[name='goal']").find(x=>x.value==="wohnen").checked = true;
+        $$("input[name='bausparen_interest']").find(x=>x.value==="unsicher").checked = true;
+        $$("input[name='bausparen_barrier']").find(x=>x.value==="wissen").checked = true;
+        const boxes = $$("input[type='checkbox'][name='insurance_priorities']");
+        boxes.forEach(b=>b.checked=false);
+        boxes.find(b=>b.value==="haftpflicht").checked = true;
+        boxes.find(b=>b.value==="reise").checked = true;
+        $$("input[name='contact_pref']").find(x=>x.value==="faq").checked = true;
+        $("#openText").value = "Was ist der Unterschied zwischen Bausparen und alternativen Sparformen?";
+        toast("Demo ausgefüllt – jetzt absenden");
+      });
+    }
+
+    // Q&A -> Explain
+    $("#toExplain").addEventListener("click", ()=>{
+      const last = getLastAnswer();
+      if(!last){
+        toast("Bitte zuerst die Umfrage ausfüllen.");
+        showTab("survey");
+        return;
+      }
+      renderExplain(last);
+      unlockNextTabs();
+      if(isQRMode()) setQRStep(3);
+      showTab("explain");
+    });
+
+    // Admin navigation buttons
+    $("#adminJumpSurvey").addEventListener("click", ()=>showTab("survey"));
+    $("#adminJumpResults").addEventListener("click", ()=>showTab("results"));
+    $("#backToSurvey").addEventListener("click", ()=>showTab("survey"));
+    $("#backToQna").addEventListener("click", ()=>{
+      const last = getLastAnswer();
+      if(last){ renderQna(last); }
+      showTab("qna");
+      if(isQRMode()) setQRStep(2);
+    });
+    $("#toResults").addEventListener("click", ()=>showTab("results"));
+
+    $("#adminToOverview").addEventListener("click", ()=>showTab("overview"));
+    $("#adminToSurvey").addEventListener("click", ()=>showTab("survey"));
+
+    // QR restart button
+    $("#qrRestart").addEventListener("click", ()=>{
+      // restart flow without deleting data
+      setQRStep(1);
+      showTab("survey");
+      document.getElementById("surveyForm").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+
+    // Reset
+    $("#resetAll").addEventListener("click", ()=>{
+      localStorage.removeItem(STORE_ANSWERS);
+      localStorage.removeItem(STORE_LAST);
+      $("#surveyStatus").textContent = "Zurückgesetzt. Du kannst neu starten.";
+      $("#exportStatus").textContent = "";
+      $("#qnaTab").disabled = true;
+      $("#explainTab").disabled = true;
+      updateResultsUI();
+      updateOverviewKpis();
+      toast("Zurückgesetzt");
+      showTab(isQRMode() ? "survey" : "overview");
+      if(isQRMode()) setQRStep(1);
+    });
+
+    // Results UI (admin)
+    function updateResultsUI(){
+      const all = readAll();
+      const rCount = $("#rCount"); if(rCount) rCount.textContent = String(all.length);
+      const rB = $("#rBausparen"); if(rB) rB.textContent = freqTop(all.map(x=>x.bausparen_interest));
+      const rI = $("#rInsurance"); if(rI) rI.textContent = freqTop(all.map(x=>x.insurance_priorities));
+      const box = $("#exportBox");
+      if(box){
+        box.value = JSON.stringify({ exportedAt: new Date().toISOString(), count: all.length, answers: all }, null, 2);
+      }
+    }
+
+    function updateOverviewKpis(){
+      const all = readAll();
+      const k1 = $("#kpiCount"); if(k1) k1.textContent = String(all.length);
+      const k2 = $("#kpiTopBausparen"); if(k2) k2.textContent = freqTop(all.map(x=>x.bausparen_interest));
+      const k3 = $("#kpiTopInsurance"); if(k3) k3.textContent = freqTop(all.map(x=>x.insurance_priorities));
+    }
+
+    updateResultsUI();
+    updateOverviewKpis();
+
+    // Export actions
+    const copyBtn = $("#copyJson");
+    if(copyBtn){
+      copyBtn.addEventListener("click", async ()=>{
+        try{
+          await navigator.clipboard.writeText($("#exportBox").value);
+          $("#exportStatus").textContent = "JSON wurde kopiert.";
+          toast("Kopiert 📋");
+        }catch{
+          $("#exportStatus").textContent = "Kopieren nicht möglich (Browser-Einstellungen).";
+          toast("Kopieren fehlgeschlagen");
+        }
+      });
+    }
+
+    const dlBtn = $("#downloadJson");
+    if(dlBtn){
+      dlBtn.addEventListener("click", ()=>{
+        safeDownload("debeka-umfrage-export.json", $("#exportBox").value);
+        $("#exportStatus").textContent = "Download gestartet.";
+        toast("Download ⬇️");
+      });
+    }
+
+    // Boot
+    function boot(){
+      const baseUrl = location.href.split("#")[0].split("?")[0];
+      const qrUrl = baseUrl + "#qr";
+      $("#qrLinkBox").textContent = qrUrl;
+      $("#qrLinkInline").textContent = qrUrl;
+      $("#qrLinkRepeat").textContent = qrUrl;
+
+      $("#today").textContent = new Date().toLocaleDateString("de-DE", { year:"numeric", month:"long", day:"numeric" });
+
+      const qr = isQRMode();
+      if(qr){
+        document.body.classList.add("qr-mode");
+        $("#qrBanner").style.display = "block";
+        // QR flow always starts at survey
+        showTab("survey");
+        setQRStep(1);
+        toast("QR-Modus aktiv ✅");
+
+        // If there is a last answer (same device), allow jumping to Q&A/Explain
+        const last = getLastAnswer();
+        if(last){
+          unlockNextTabs();
+          renderQna(last);
+          renderExplain(last);
+          // If user refreshes in qr mode after survey, keep them at survey (step 1) to re-answer
+          // They will progress after submit again.
+        }
+      }else{
+        // admin mode
+        const last = getLastAnswer();
+        if(last){
+          unlockNextTabs();
+          renderQna(last);
+          renderExplain(last);
+        }
+        showTab("overview");
+      }
+    }
+    boot();
+    function applyQrMode() {
+  const isQr = (location.hash || "").toLowerCase().includes("qr");
+    }
+
+  </script>
+</body>
+</html>

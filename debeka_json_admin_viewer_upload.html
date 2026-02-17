@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DeBeKa – JSON Auswertung (Admin Viewer)</title>
+  <style>
+    :root{
+      --debeka-blue:#1e9ad6;
+      --debeka-blue-soft:rgba(30,154,214,.18);
+      --bg:#07101a;
+      --text:#eaf3ff;
+      --muted:#b8c9e6;
+      --line:rgba(255,255,255,.12);
+      --shadow:0 16px 50px rgba(0,0,0,.35);
+      --radius:18px;
+      --radius2:14px;
+      --max:1200px;
+      --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      background:
+        radial-gradient(1100px 650px at 12% -10%, var(--debeka-blue-soft), transparent 60%),
+        radial-gradient(900px 600px at 90% 0%, rgba(30,154,214,.10), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.5;
+    }
+    .wrap{max-width:var(--max); margin:0 auto; padding:28px 18px 60px;}
+    header{
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:16px; padding:18px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(11,23,38,.92), rgba(10,20,34,.78));
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      position:sticky; top:14px;
+      backdrop-filter: blur(10px);
+      z-index:10;
+    }
+    @media (max-width: 860px){ header{position:relative; top:auto; flex-direction:column} }
+
+    .brand{display:flex; align-items:center; gap:12px;}
+    .brand h1{font-size:16px; margin:0; letter-spacing:.2px}
+    .brand p{margin:2px 0 0; font-size:12px; color:var(--muted)}
+    .logoImg{height:44px; width:auto; display:block; filter: drop-shadow(0 10px 24px rgba(30,154,214,.18));}
+
+    .card{
+      margin-top:16px;
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(11,23,38,.82), rgba(10,20,34,.74));
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card .inner{padding:18px;}
+    .card h2{margin:0 0 10px; font-size:18px}
+    .muted{color:var(--muted); font-size:13px}
+
+    .row{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end}
+    label{display:block; font-weight:800; font-size:13px; margin-bottom:6px}
+    .field{
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      border-radius:var(--radius2);
+      padding:12px;
+      outline:none;
+      transition:.15s ease;
+      min-width:240px;
+    }
+    textarea.field{width:100%; min-height:140px; resize:vertical}
+    .field:focus{border-color:rgba(30,154,214,.65); box-shadow:0 0 0 4px rgba(30,154,214,.18)}
+    .btn{
+      border:1px solid rgba(30,154,214,.60);
+      background:linear-gradient(135deg, rgba(30,154,214,.24), rgba(255,255,255,.04));
+      color:var(--text);
+      padding:11px 14px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:850;
+      font-size:13px;
+      transition:.15s ease;
+      text-decoration:none;
+      display:inline-block;
+    }
+    .btn:hover{transform: translateY(-1px)}
+    .btn.secondary{
+      border-color:rgba(255,255,255,.18);
+      background:rgba(255,255,255,.04);
+      font-weight:700;
+    }
+    .btn.danger{
+      border-color: rgba(255,107,107,.5);
+      background: rgba(255,107,107,.12);
+    }
+
+    .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:12px;}
+    @media (max-width: 980px){ .kpis{grid-template-columns:1fr 1fr} }
+    @media (max-width: 560px){ .kpis{grid-template-columns:1fr} }
+    .kpis .box{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:var(--radius);
+      padding:14px;
+    }
+    .kpis .box strong{display:block; font-size:20px}
+    .kpis .box span{color:var(--muted); font-size:12px}
+
+    .grid2{display:grid; grid-template-columns:1.25fr .75fr; gap:16px;}
+    @media (max-width: 980px){ .grid2{grid-template-columns:1fr} }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      font-size:13px;
+    }
+    th, td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      vertical-align:top;
+    }
+    th{
+      text-align:left;
+      font-size:12px;
+      letter-spacing:.2px;
+      color:rgba(234,243,255,.92);
+      background:rgba(255,255,255,.03);
+      position:sticky;
+      top:0;
+    }
+    tr:last-child td{border-bottom:none}
+    .tag{
+      display:inline-block;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(30,154,214,.45);
+      background:rgba(30,154,214,.12);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .small{font-size:12px; color:var(--muted)}
+    .status{margin-top:8px; font-size:13px; color:rgba(234,243,255,.92);}
+    .pillRow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .pill{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:rgba(234,243,255,.95);
+      padding:8px 10px;
+      border-radius:999px;
+      font-weight:750;
+      font-size:12px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .dot{width:8px; height:8px; border-radius:99px; background: rgba(30,154,214,.75); display:inline-block;}
+    details{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:var(--radius);
+      padding:12px;
+      margin-bottom:10px;
+    }
+    summary{cursor:pointer; list-style:none; font-weight:850; font-size:14px; outline:none;}
+    summary::-webkit-details-marker{display:none}
+    pre{
+      margin:10px 0 0;
+      white-space:pre-wrap;
+      word-break:break-word;
+      background:rgba(0,0,0,.18);
+      padding:10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      color:rgba(234,243,255,.92);
+      font-size:12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <img class="logoImg" src="https://upload.wikimedia.org/wikipedia/commons/8/87/Debeka.svg" alt="Debeka Logo" />
+        <div>
+          <h1>JSON Auswertung (Admin Viewer)</h1>
+          <p>Öffne/importe JSON-Exporte und sieh eine Gesamtübersicht + Detailtabelle.</p>
+        </div>
+      </div>
+      <div style="min-width:260px;">
+        <div class="small"><span class="tag">Offline / Privat</span></div>
+        <div class="small" style="margin-top:6px;">Tipp: Du kannst mehrere JSON-Dateien gleichzeitig laden.</div>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="inner">
+        <h2>1) JSON-Dateien laden</h2>
+        <div class="grid2">
+          <div>
+            <div class="row">
+              <div style="flex:1; min-width:260px;">
+                <label for="fileInput">JSON-Dateien (Export)</label>
+                <input class="field" id="fileInput" type="file" accept=".json,application/json" multiple />
+                <div class="small" style="margin-top:6px;">
+                  Erwartet Formate wie: <span class="tag">{"exportedAt": "...", "answers": [...]}</span> oder direkt ein <span class="tag">[...]</span>.
+                </div>
+              </div>
+
+              <button class="btn secondary" type="button" id="loadSample">Beispiel-Daten laden</button>
+              <button class="btn secondary" type="button" id="loadFromLocal">Aus LocalStorage laden</button>
+              <button class="btn danger" type="button" id="clearAll">Alles leeren</button>
+            </div>
+
+            <div style="margin-top:14px;">
+              <label for="pasteBox">Oder JSON einfügen (optional)</label>
+              <textarea class="field" id="pasteBox" placeholder='JSON hier einfügen (z. B. {"answers":[...]} )'></textarea>
+              <div class="row" style="margin-top:10px;">
+                <button class="btn" type="button" id="importPaste">Einfügen importieren</button>
+                <div class="status" id="status">Noch keine Daten geladen.</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 style="margin-top:0;">2) Gesamtübersicht</h2>
+            <div class="kpis">
+              <div class="box"><strong id="kpiCount">0</strong><span>Antworten gesamt</span></div>
+              <div class="box"><strong id="kpiFiles">0</strong><span>Dateien geladen</span></div>
+              <div class="box"><strong id="kpiTopBausparen">–</strong><span>Top: Bausparen-Interesse</span></div>
+              <div class="box"><strong id="kpiTopInsurance">–</strong><span>Top: Versicherung (Priorität)</span></div>
+            </div>
+
+            <div class="pillRow">
+              <span class="pill"><span class="dot"></span> Filter & Suche unten</span>
+              <span class="pill"><span class="dot"></span> Details pro Antwort</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="inner">
+        <h2>3) Tabelle (Details)</h2>
+        <div class="row">
+          <div style="flex:1; min-width:240px;">
+            <label for="searchBox">Suche (Text)</label>
+            <input class="field" id="searchBox" type="text" placeholder="z. B. 'unsicher', 'bu', 'wohnen' ..." />
+          </div>
+          <div style="min-width:240px;">
+            <label for="filterBausparen">Filter: Bausparen-Interesse</label>
+            <select class="field" id="filterBausparen">
+              <option value="">Alle</option>
+              <option value="sehr">sehr</option>
+              <option value="eher">eher</option>
+              <option value="unsicher">unsicher</option>
+              <option value="nicht">nicht</option>
+            </select>
+          </div>
+          <div style="min-width:240px;">
+            <label for="filterBarrier">Filter: Hürde</label>
+            <select class="field" id="filterBarrier">
+              <option value="">Alle</option>
+              <option value="wissen">wissen</option>
+              <option value="budget">budget</option>
+              <option value="lohnt">lohnt</option>
+              <option value="flex">flex</option>
+            </select>
+          </div>
+          <div style="min-width:240px;">
+            <label for="limitRows">Zeilenlimit</label>
+            <select class="field" id="limitRows">
+              <option value="25">25</option>
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+              <option value="500">500</option>
+              <option value="999999">Alle</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:14px; overflow:auto; max-height:520px; border-radius:14px;">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Zeit</th>
+                <th>Alter</th>
+                <th>Status</th>
+                <th>Ziel</th>
+                <th>Bausparen</th>
+                <th>Hürde</th>
+                <th>Versicherung (max 2)</th>
+                <th>Kontakt</th>
+                <th>Offene Frage</th>
+              </tr>
+            </thead>
+            <tbody id="tbody">
+              <tr><td colspan="10" class="muted">Noch keine Daten.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="row" style="margin-top:14px;">
+          <button class="btn secondary" type="button" id="exportMerged">Gesamt-JSON herunterladen</button>
+          <button class="btn secondary" type="button" id="copyMerged">Gesamt-JSON kopieren</button>
+          <div class="status" id="mergeStatus"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="inner">
+        <h2>4) Rohdaten (Debug)</h2>
+        <details>
+          <summary>Rohdaten anzeigen (zusammengeführt)</summary>
+          <pre id="rawOut">{}</pre>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const $ = (s, r=document) => r.querySelector(s);
+
+    let loadedFiles = [];   // [{name, count}]
+    let allAnswers = [];    // flattened answers
+
+    function normalizeExport(json){
+      // Accept:
+      // 1) {answers:[...]}  2) {count, answers:[...]}  3) [...]  4) {exportedAt, answers:[...]}
+      if(Array.isArray(json)) return json;
+      if(json && Array.isArray(json.answers)) return json.answers;
+      // Sometimes one answer object:
+      if(json && typeof json === "object" && json.ts) return [json];
+      return [];
+    }
+
+    function toText(v){
+      if(v===null || v===undefined) return "";
+      if(Array.isArray(v)) return v.join(", ");
+      return String(v);
+    }
+
+    function freqTop(values){
+      const map = new Map();
+      values.forEach(v=>{
+        if(v===undefined || v===null || v==="" ) return;
+        if(Array.isArray(v)){ v.forEach(x => map.set(x, (map.get(x)||0)+1)); }
+        else { map.set(v, (map.get(v)||0)+1); }
+      });
+      let best=null, bestN=0;
+      for(const [k,n] of map.entries()){ if(n>bestN){ best=k; bestN=n; } }
+      return best ? `${best} (${bestN})` : "–";
+    }
+
+    function updateKpis(){
+      $("#kpiCount").textContent = String(allAnswers.length);
+      $("#kpiFiles").textContent = String(loadedFiles.length);
+      $("#kpiTopBausparen").textContent = freqTop(allAnswers.map(a=>a.bausparen_interest));
+      $("#kpiTopInsurance").textContent = freqTop(allAnswers.map(a=>a.insurance_priorities));
+    }
+
+    function applyFilters(){
+      const q = ($("#searchBox").value || "").trim().toLowerCase();
+      const fB = $("#filterBausparen").value;
+      const fH = $("#filterBarrier").value;
+      const limit = parseInt($("#limitRows").value, 10) || 50;
+
+      const rows = [];
+      for(const a of allAnswers){
+        if(fB && (a.bausparen_interest || "") !== fB) continue;
+        if(fH && (a.bausparen_barrier || "") !== fH) continue;
+
+        if(q){
+          const hay = [
+            a.ts, a.ageGroup, a.status, a.goal, a.bausparen_interest, a.bausparen_barrier,
+            ...(Array.isArray(a.insurance_priorities)? a.insurance_priorities: []),
+            a.contact_pref, a.openText
+          ].map(toText).join(" ").toLowerCase();
+          if(!hay.includes(q)) continue;
+        }
+        rows.push(a);
+        if(rows.length >= limit) break;
+      }
+      renderTable(rows);
+      renderRaw();
+    }
+
+    function renderTable(rows){
+      const tb = $("#tbody");
+      tb.innerHTML = "";
+      if(!rows.length){
+        tb.innerHTML = `<tr><td colspan="10" class="muted">Keine Treffer mit den aktuellen Filtern.</td></tr>`;
+        return;
+      }
+      rows.forEach((a, i)=>{
+        const tr = document.createElement("tr");
+        const ts = a.ts ? new Date(a.ts).toLocaleString("de-DE") : "";
+        tr.innerHTML = `
+          <td>${i+1}</td>
+          <td>${ts}</td>
+          <td>${toText(a.ageGroup)}</td>
+          <td>${toText(a.status)}</td>
+          <td>${toText(a.goal)}</td>
+          <td>${toText(a.bausparen_interest)}</td>
+          <td>${toText(a.bausparen_barrier)}</td>
+          <td>${toText(a.insurance_priorities)}</td>
+          <td>${toText(a.contact_pref)}</td>
+          <td>${toText(a.openText)}</td>
+        `;
+        tb.appendChild(tr);
+      });
+    }
+
+    function mergedExport(){
+      return {
+        exportedAt: new Date().toISOString(),
+        files: loadedFiles,
+        count: allAnswers.length,
+        answers: allAnswers
+      };
+    }
+
+    function renderRaw(){
+      const obj = mergedExport();
+      $("#rawOut").textContent = JSON.stringify(obj, null, 2);
+    }
+
+    async function importFromFileList(fileList){
+      const files = Array.from(fileList || []);
+      if(!files.length) return;
+
+      let addedAnswers = 0;
+      for(const f of files){
+        try{
+          const text = await f.text();
+          const json = JSON.parse(text);
+          const arr = normalizeExport(json);
+          if(!arr.length) throw new Error("Keine answers[] gefunden");
+          allAnswers.push(...arr);
+          loadedFiles.push({ name: f.name, count: arr.length });
+          addedAnswers += arr.length;
+        }catch(err){
+          $("#status").textContent = `Fehler bei ${f.name}: ${err.message || err}`;
+        }
+      }
+
+      $("#status").textContent = `Geladen: ${files.length} Datei(en), +${addedAnswers} Antworten.`;
+      updateKpis();
+      applyFilters();
+    }
+
+    function safeDownload(filename, text){
+      const blob = new Blob([text], {type:"application/json;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a);
+      a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 800);
+    }
+
+    async function copyToClipboard(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        return true;
+      }catch{
+        return false;
+      }
+    }
+
+    // UI events
+    $("#fileInput").addEventListener("change", (e)=>importFromFileList(e.target.files));
+
+    $("#importPaste").addEventListener("click", ()=>{
+      const t = ($("#pasteBox").value || "").trim();
+      if(!t){ $("#status").textContent = "Nichts eingefügt."; return; }
+      try{
+        const json = JSON.parse(t);
+        const arr = normalizeExport(json);
+        if(!arr.length) throw new Error("Keine answers[] gefunden");
+        allAnswers.push(...arr);
+        loadedFiles.push({ name: "PASTE", count: arr.length });
+        $("#status").textContent = `Importiert: +${arr.length} Antworten.`;
+        updateKpis();
+        applyFilters();
+      }catch(err){
+        $("#status").textContent = `Paste-Fehler: ${err.message || err}`;
+      }
+    });
+
+    $("#clearAll").addEventListener("click", ()=>{
+      loadedFiles = [];
+      allAnswers = [];
+      $("#pasteBox").value = "";
+      $("#fileInput").value = "";
+      $("#status").textContent = "Alles geleert.";
+      updateKpis();
+      applyFilters();
+    });
+
+    $("#searchBox").addEventListener("input", applyFilters);
+    $("#filterBausparen").addEventListener("change", applyFilters);
+    $("#filterBarrier").addEventListener("change", applyFilters);
+    $("#limitRows").addEventListener("change", applyFilters);
+
+    $("#exportMerged").addEventListener("click", ()=>{
+      const text = JSON.stringify(mergedExport(), null, 2);
+      safeDownload("debeka-umfrage-gesamt.json", text);
+      $("#mergeStatus").textContent = "Download gestartet.";
+    });
+
+    $("#copyMerged").addEventListener("click", async ()=>{
+      const text = JSON.stringify(mergedExport(), null, 2);
+      const ok = await copyToClipboard(text);
+      $("#mergeStatus").textContent = ok ? "Kopiert." : "Kopieren nicht möglich.";
+    });
+
+    $("#loadSample").addEventListener("click", ()=>{
+      const sample = [
+        {
+          ts: new Date().toISOString(),
+          ageGroup: "19-22",
+          status: "student",
+          goal: "wohnen",
+          bausparen_interest: "unsicher",
+          bausparen_barrier: "wissen",
+          insurance_priorities: ["haftpflicht","reise"],
+          contact_pref: "faq",
+          openText: "Wie funktioniert das grundsätzlich?"
+        },
+        {
+          ts: new Date(Date.now()-86400000).toISOString(),
+          ageGroup: "23-26",
+          status: "azubi",
+          goal: "ruecklagen",
+          bausparen_interest: "eher",
+          bausparen_barrier: "budget",
+          insurance_priorities: ["bu"],
+          contact_pref: "vergleich",
+          openText: ""
+        }
+      ];
+      allAnswers.push(...sample);
+      loadedFiles.push({ name:"SAMPLE", count: sample.length });
+      $("#status").textContent = `Beispieldaten geladen: +${sample.length} Antworten.`;
+      updateKpis();
+      applyFilters();
+    });
+
+    // initial
+    updateKpis();
+    applyFilters();
+  
+    // Load from localStorage (same origin as main page)
+    $("#loadFromLocal").addEventListener("click", ()=>{
+      try{
+        const raw = localStorage.getItem("debeka_answers_v3") || localStorage.getItem("debeka_survey_answers_v1") || localStorage.getItem("debeka_final_answers") || "";
+        if(!raw){ $("#status").textContent = "Keine lokalen Umfrage-Daten gefunden."; return; }
+        const arr = JSON.parse(raw);
+        if(!Array.isArray(arr)){ $("#status").textContent = "Lokale Daten haben ein unerwartetes Format."; return; }
+        loadedFiles.push({name:"localStorage", count: arr.length});
+        allAnswers = allAnswers.concat(arr);
+        $("#status").textContent = `LocalStorage geladen: ${arr.length} Antworten.`;
+        updateKpis();
+        applyFilters();
+        $("#rawOut").textContent = JSON.stringify({answers: allAnswers}, null, 2);
+      }catch(e){
+        $("#status").textContent = "Fehler beim Laden aus LocalStorage.";
+      }
+    });
+
+  </script>
+</body>
+</html>
