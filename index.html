@@ -1179,7 +1179,7 @@ async function trySyncAllToCloud(arr){
     // ===== Survey -> Firestore speichern =====
 const form = document.getElementById("surveyForm");
 
-form.addEventListener("submit", async (e) => {
+form.addEventListener("submit"), async (e) => {
   // Wenn dein bestehender Code bereits e.preventDefault() nutzt,
   // dann lass diese Zeile drin – sonst speichert es nicht stabil.
   e.preventDefault();
@@ -1196,7 +1196,7 @@ form.addEventListener("submit", async (e) => {
       data[k] = v;
     }
   }
-})
+}
 
   //try {
     //await addDoc(collection(window.db, "responses"), {
