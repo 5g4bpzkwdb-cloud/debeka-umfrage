@@ -1177,26 +1177,26 @@ async function trySyncAllToCloud(arr){
     const app = initializeApp(firebaseConfig);
     window.db = getFirestore(app);
     // ===== Survey -> Firestore speichern =====
-const form = document.getElementById("surveyForm");
+//const form = document.getElementById("surveyForm");
 
-form.addEventListener("submit"), async (e) => {
+//form.addEventListener("submit", async (e) => {
   // Wenn dein bestehender Code bereits e.preventDefault() nutzt,
   // dann lass diese Zeile drin – sonst speichert es nicht stabil.
-  e.preventDefault();
+ //e.preventDefault();
 
-  const formData = new FormData(form);
+  //const formData = new FormData(form);
 
   // Radio-Gruppen / Mehrfachwerte sauber sammeln
-  const data = {};
-  for (const [k, v] of formData.entries()) {
-    if (data[k]) {
+  //const data = {};
+  //for (const [k, v] of formData.entries()) {
+   // if (data[k]) {
       // falls Mehrfachauswahl irgendwann vorkommt
-      data[k] = Array.isArray(data[k]) ? [...data[k], v] : [data[k], v];
-    } else {
-      data[k] = v;
-    }
-  }
-}
+     // data[k] = Array.isArray(data[k]) ? [...data[k], v] : [data[k], v];
+    //} else {
+     // data[k] = v;
+    //}
+//  }
+
 
   //try {
     //await addDoc(collection(window.db, "responses"), {
