@@ -715,10 +715,37 @@
       try{ return JSON.parse(localStorage.getItem(STORE_ANSWERS) || "[]"); } catch { return []; }
     }
     function writeAll(arr){
-      localStorage.setItem(STORE_ANSWERS, JSON.stringify(arr));
-      updateResultsUI();
-      updateOverviewKpis();
-    }
+  localStorage.setItem(STORE_ANSWERS, JSON.stringify(arr));
+  updateResultsUI();
+  updateOverviewKpis();
+
+  //  Cloud Sync (Firestore) – speichert die komplette Übersicht
+  trySyncAllToCloud(arr);
+}
+async function trySyncAllToCloud(arr){
+  try{
+    // Nur wenn Firebase initialisiert ist
+    if(!window.db || !window.firebaseAddDoc || !window.firebaseCollection) return;
+
+    // Optional: nicht im Admin-Modus syncen (wenn du willst)
+    // if(!(location.hash || "").toLowerCase().includes("qr")) return;
+
+    await window.firebaseAddDoc(
+      window.firebaseCollection(window.db, "responses"),
+      {
+        answersAll: arr,
+        createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
+        page: location.href,
+        ua: navigator.userAgent
+      }
+    );
+    // optional: toast("Cloud gespeichert ✅");
+  } catch(e){
+    console.error("Cloud Sync (all) failed:", e);
+    // optional: toast("Speichern fehlgeschlagen (Cloud).");
+  }
+}
+
 
     function getLastAnswer(){
       try{ return JSON.parse(localStorage.getItem(STORE_LAST) || "null"); }catch{ return null; }
@@ -1135,6 +1162,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
     const firebaseConfig = {
