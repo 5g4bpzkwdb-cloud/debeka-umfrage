@@ -1177,46 +1177,56 @@ async function trySyncAllToCloud(arr){
     const app = initializeApp(firebaseConfig);
     window.db = getFirestore(app);
     // ===== Survey -> Firestore speichern =====
-const form = document.getElementById("surveyForm");
-
-form.addEventListener("submit", async (e) => {
-  // Wenn dein bestehender Code bereits e.preventDefault() nutzt,
-  // dann lass diese Zeile drin – sonst speichert es nicht stabil.
-  e.preventDefault();
-
-  const formData = new FormData(form);
-
-  // Radio-Gruppen / Mehrfachwerte sauber sammeln
-  const data = {};
-  for (const [k, v] of formData.entries()) {
-    if (data[k]) {
-      // falls Mehrfachauswahl irgendwann vorkommt
-      data[k] = Array.isArray(data[k]) ? [...data[k], v] : [data[k], v];
-    } else {
-      data[k] = v;
-    }
+window.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("surveyForm");
+  if (!form) {
+    console.error("❌ surveyForm nicht gefunden. Prüfe id='surveyForm' im HTML.");
+    return;
   }
-}
 
-  // 1) Lokale Gesamtauswertung (so wie Admin-View sie nutzt) holen:
-let answersAll = [];
-try {
-  answersAll = JSON.parse(localStorage.getItem("debeka_answers_v3") || "[]");
-} catch (e) {
-  answersAll = [];
-}
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-// 2) Dieses neue Ergebnis noch anhängen (falls dein bestehender Code es NICHT schon vorher gespeichert hat):
-answersAll.push({ ...data, _ts: Date.now() });
+    const formData = new FormData(form);
+    const data = {};
+    for (const [k, v] of formData.entries()) {
+      if (data[k]) data[k] = Array.isArray(data[k]) ? [...data[k], v] : [data[k], v];
+      else data[k] = v;
+    }
 
-// 3) Firestore: alles speichern
-await addDoc(collection(window.db, "responses"), {
-  answersAll: answersAll,          // ✅ das ist deine komplette Umfrage-Historie
-  last: data,                      // optional: letztes Ergebnis separat
-  createdAt: serverTimestamp(),
-  page: location.href,
-  ua: navigator.userAgent
+    // Key aus deinem Projekt (anpassen falls anders!)
+    const KEY = "debeka_answers_v3";
+
+    let answersAll = [];
+    try {
+      answersAll = JSON.parse(localStorage.getItem(KEY) || "[]");
+    } catch {
+      answersAll = [];
+    }
+
+    answersAll.push({ ...data, _ts: Date.now() });
+
+    // localStorage aktualisieren (damit Admin-View es wie gewohnt sieht)
+    localStorage.setItem(KEY, JSON.stringify(answersAll));
+
+    // Firestore speichern
+    try {
+      await addDoc(collection(window.db, "responses"), {
+        answers: data,
+        createdAt: serverTimestamp(),
+        page: location.href,
+        ua: navigator.userAgent
+      });
+
+      console.log("✅ Firestore + local gespeichert", data);
+      alert("Gespeichert ✅");
+    } catch (err) {
+      console.error("❌ Firestore Fehler:", err);
+      alert("Speichern fehlgeschlagen (Cloud). Öffne die Konsole für Details.");
+    }
+  });
 });
+
 
 
   </script>
