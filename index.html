@@ -733,11 +733,12 @@ async function trySyncAllToCloud(arr){
     await window.firebaseAddDoc(
       window.firebaseCollection(window.db, "responses"),
       {
-        answersAll: arr,
-        createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
-        page: location.href,
-        ua: navigator.userAgent
-      }
+  answers: (arr && arr.length) ? arr[arr.length - 1] : null,   // ✅ nur die letzte Umfrage
+  createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
+  page: location.href,
+  ua: navigator.userAgent
+}
+
     );
     // optional: toast("Cloud gespeichert ✅");
   } catch(e){
@@ -1158,78 +1159,30 @@ async function trySyncAllToCloud(arr){
 
   <!-- dein kompletter Website Inhalt -->
 
-  <!-- Firebase Script HIER rein -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyAFFwh67DFW4b3aKwPRlit7GRvH0bKlDG8",
+    authDomain: "debeka-umfrage.firebaseapp.com",
+    projectId: "debeka-umfrage",
+    storageBucket: "debeka-umfrage.firebasestorage.app",
+    messagingSenderId: "295363329740",
+    appId: "1:295363329740:web:fd2e3f6ee264bb9a208c69"
+  };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAFFwh67DFW4b3aKwPRlit7GRvH0bKlDG8",
-      authDomain: "debeka-umfrage.firebaseapp.com",
-      projectId: "debeka-umfrage",
-      storageBucket: "debeka-umfrage.firebasestorage.app",
-      messagingSenderId: "295363329740",
-      appId: "1:295363329740:web:fd2e3f6ee264bb9a208c69"
-    };
+  const app = initializeApp(firebaseConfig);
+  window.db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    window.db = getFirestore(app);
-    // ===== Survey -> Firestore speichern =====
-window.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("surveyForm");
-  if (!form) {
-    console.error("❌ surveyForm nicht gefunden. Prüfe id='surveyForm' im HTML.");
-    return;
-  }
+  // Diese Globals nutzt dein bestehender Code (writeAll -> trySyncAllToCloud)
+  window.firebaseCollection = collection;
+  window.firebaseAddDoc = addDoc;
+  window.firebaseServerTimestamp = serverTimestamp;
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  console.log("✅ Firebase init ok");
+</script>
 
-    const formData = new FormData(form);
-    const data = {};
-    for (const [k, v] of formData.entries()) {
-      if (data[k]) data[k] = Array.isArray(data[k]) ? [...data[k], v] : [data[k], v];
-      else data[k] = v;
-    }
-
-    // Key aus deinem Projekt (anpassen falls anders!)
-    const KEY = "debeka_answers_v3";
-
-    let answersAll = [];
-    try {
-      answersAll = JSON.parse(localStorage.getItem(KEY) || "[]");
-    } catch {
-      answersAll = [];
-    }
-
-    answersAll.push({ ...data, _ts: Date.now() });
-
-    // localStorage aktualisieren (damit Admin-View es wie gewohnt sieht)
-    localStorage.setItem(KEY, JSON.stringify(answersAll));
-
-    // Firestore speichern
-    try {
-      await addDoc(collection(window.db, "responses"), {
-        answers: data,
-        createdAt: serverTimestamp(),
-        page: location.href,
-        ua: navigator.userAgent
-      });
-
-      console.log("✅ Firestore + local gespeichert", data);
-      alert("Gespeichert ✅");
-    } catch (err) {
-      console.error("❌ Firestore Fehler:", err);
-      alert("Speichern fehlgeschlagen (Cloud). Öffne die Konsole für Details.");
-    }
-  });
-});
-
-
-
-  </script>
 
 
 
